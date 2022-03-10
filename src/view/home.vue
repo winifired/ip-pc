@@ -1,30 +1,17 @@
 <template>
-  <div class="login">
-    <!-- <Particles id="tsparticles" class="login__particles" :options="particles" /> -->
-  </div>
+  <div class="login"></div>
 </template>
 <script setup>
-import {sidan} from '../utils/ribbon.js'
-// import { particles } from '../utils/particles-config-home.js'
+import { sidan } from "../utils/ribbon.js";
 sidan();
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .login {
-  flex: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  position: relative;
-  height: 100vh;
-  width:100vm;
+  height: calc(100vh - 80px);
+  width: 100vw;
   overflow: hidden;
-
-  &__particles {
-    height: 100%;
-    width: 100%;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-image: url('../assets/bg1.jpg');
-  }
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: url("../assets/bg1.jpg");
 }
 </style>

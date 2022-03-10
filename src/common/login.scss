@@ -1,0 +1,116 @@
+.content {
+    width: 510px;
+    padding: 67px 0 44px;
+    background: #ffffff;
+    border-radius: 10px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+
+    >div {
+        width: 406px;
+    }
+
+    h3 {
+        font-size: 28px;
+        font-family: PingFang SC;
+        font-weight: 400;
+        color: #333333;
+        margin-bottom: 73px;
+
+        span {
+            color: #45aeff;
+        }
+    }
+
+    .input {
+        height: 58px;
+        background: #ffffff;
+        border: 2px solid #e1e1e1;
+        border-radius: 6px;
+        padding: 0 19px;
+
+        input {
+            flex: 1;
+            height: 40px;
+        }
+
+        .icon {
+            width: 1.5em;
+            height: 1.5em;
+            margin-right: 14px;
+        }
+    }
+
+    div.input:not(:last-child) {
+        margin-bottom: 30px;
+    }
+
+    .readPass {
+        margin-top: 53px;
+
+        >div {
+            color: #070707;
+            line-height: 22px;
+        }
+
+        .box-border {
+            width: 22px;
+            height: 22px;
+            background: #ffffff;
+            border: 2px solid #e1e1e1;
+            border-radius: 4px;
+            margin-right: 7px;
+        }
+    }
+
+    .confirm {
+        height: 56px;
+        line-height: 56px;
+        background: #45aeff;
+        border-radius: 6px;
+        text-align: center;
+        color: #ffffff;
+        margin: 24px 0;
+    }
+
+    .tip {
+        color: #737373;
+
+        span {
+            color: #45AEFF
+        }
+    }
+}
+
+.login {
+    flex: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+
+    &__particles {
+        height: 100%;
+        width: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-image: url("../assets/bg1.jpg");
+    }
+}
+
+.company {
+    font-size: 18px;
+    font-family: PingFang SC;
+    font-weight: 300;
+    color: #7C7C7C;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+}

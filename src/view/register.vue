@@ -11,20 +11,17 @@
         <Unlock class="icon" color="#A8A8A8" style="width:1.8em;height:1.8em;" />
         <input type="text" placeholder="请输入密码" v-model="password" class="font20" />
       </div>
-      <div class="readPass">
-        <div class="flex font20 cursor" @click="checked=!checked">
-          <p class="box-border flex area-center">
-            <Check style="width: 1em; height: 1em" color="red" v-show="checked" />
-          </p>
-          记住密码
-        </div>
+     <div class="flex row-center input">
+        <Unlock class="icon" color="#A8A8A8" style="width:1.8em;height:1.8em;" />
+        <input type="text" placeholder="请再次输入密码" v-model="passwordreset" class="font20" />
       </div>
-      <div class="confirm font20 cursor">立即登录</div>
+      <div class="confirm font20 cursor">立即注册</div>
       <div>
-        <router-link to="/register" replace class="tip font20 cursor">没有账号？去<span>注册</span></router-link>
+        <router-link to="/login" replace class="tip font20">已有账号？去<span>登录</span></router-link>
       </div>
     </div>
   </div>
+  <div class="company">Copyright © 2022  XXXXXX有限公司</div>
 </template>
 <script setup>
 import { particles } from "../utils/particles-config.js";
