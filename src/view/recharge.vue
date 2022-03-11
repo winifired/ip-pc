@@ -70,7 +70,7 @@ const choosePay = ref(1);
 .content {
   width: 1230px;
   margin: 0 auto;
-  padding: 45px 0 0;
+  padding: 45px 0 200px;
   .money {
     margin-top: 22px;
   }

@@ -56,7 +56,9 @@
 .color262 {
     color: #626262;
 }
-
+.color707 {
+    color: #070707;
+}
 .coloreff {
     color: #45AEFF
 }
@@ -118,7 +120,21 @@
     font-size: 18px !important;
     color: #181818;
 }
-
+.el-table th.el-table__cell{
+    background: #F7F7F7!important;
+    border-right:3px solid #fff!important;
+    font-size: 18px!important;
+    color: #000!important;
+    font-weight: 300!important;
+}
+.el-table .cell{
+    font-size: 18px!important;
+    color: #000!important;
+    font-weight: 300!important;
+}
+.el-button>span{
+    font-size: 18px!important;
+}
 .buyButton {
     background: #fff;
 

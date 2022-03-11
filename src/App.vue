@@ -1,23 +1,22 @@
 <script setup>
 import headerPage from './components/header.vue'
-import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ref } from '@vue/reactivity'
-const router = useRouter()
+import { watch } from '@vue/runtime-core'
+const route = useRoute()
 const showHeader = ref(false)
-const companyColor = ref('#7c7c7c')
-router.beforeEach((to, form, next) => {
-  console.log(to)
-  if (to.name == 'login' || to.name == 'register') {
+const companyColor = ref('#7c7c7c');
+watch(() => route.name,(newData) => {
+  if (newData == 'login' || newData == 'register') {
     showHeader.value = false
   } else {
     showHeader.value = true
   }
-  if (to.name == 'home') {
+  if (newData == 'home') {
     companyColor.value = '#ffffff'
   } else {
     companyColor.value = '#7c7c7c'
   }
-  next()
 })
 </script>
 

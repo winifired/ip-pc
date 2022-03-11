@@ -1,10 +1,12 @@
 .content {
   width: 1230px;
+  height: 100%;
   margin: 0 auto;
   padding-top: 13px;
 
   .left {
     width: 200px;
+    height: 100%;
     background: #FFFFFF;
 
     li {
@@ -15,13 +17,42 @@
     }
 
     .activedLi {
-      background: #45AEFF!important;
-      color: #fff!important;
+      background: #45AEFF !important;
+      color: #fff !important;
+    }
+  }
+  .right{
+    flex:1;
+    margin-left:12px;
+    height: 100%;
+    background: #FFFFFF;
+    padding:22px 34px;
+    display: grid;
+    grid-template-rows: 200px calc(100% - 220px);
+    grid-row-gap: 25px;
+    .userMsg{
+      img{
+        width:70px;
+        height:70px;
+        margin-right:23px;
+      }
+      p:first-child{
+        margin-bottom:10px;
+      }
+    }
+    .title{
+      height:200px;
+      padding-bottom:14px;
+      border-bottom:1px solid #ADADAD;
     }
   }
 }
-.box{
-  width:100vw;
-  min-height: 100vh;
+
+.box {
+  min-width:100%;
   background: #F7F7F7;
+  position: absolute;
+  top: 80px;
+  left: 0;
+  bottom: 0;
 }

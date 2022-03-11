@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from "vue";
-import {useRouter} from "vue-router"
+import { ref, watch } from "vue";
+import {useRoute, useRouter} from "vue-router"
 const prop = defineProps({
   chooseHeadNav: {
     type: [Number, String],
@@ -13,18 +13,16 @@ const navbar = ref([
   { id: 3, name: "充值" },
 ]);
 const chooseNav = ref(prop.chooseHeadNav);
-console.log(chooseNav.value);
 const router=useRouter();
-router.beforeEach(to=>{
-  console.log('.....')
-  console.log(to)
-  if(to.name=='home'){
+const route=useRoute();
+watch(() => route.name,(newData) => {
+  if(newData=='home'){
     chooseNav.value=1
-  }else if(to.name=='nodePges'){
+  }else if(newData=='nodePges'){
     chooseNav.value=2
-  }else if(to.name=='recharge'){
+  }else if(newData=='recharge'){
     chooseNav.value=3
-  }else if(to.name=='user'){
+  }else if(newData=='user'){
     chooseNav.value=4
   }
 })
