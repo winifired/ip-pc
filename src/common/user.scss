@@ -1,0 +1,27 @@
+.content {
+  width: 1230px;
+  margin: 0 auto;
+  padding-top: 13px;
+
+  .left {
+    width: 200px;
+    background: #FFFFFF;
+
+    li {
+      width: 200px;
+      height: 90px;
+      line-height: 90px;
+      text-align: center;
+    }
+
+    .activedLi {
+      background: #45AEFF!important;
+      color: #fff!important;
+    }
+  }
+}
+.box{
+  width:100vw;
+  min-height: 100vh;
+  background: #F7F7F7;
+}

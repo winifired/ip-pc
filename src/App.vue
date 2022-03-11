@@ -1,34 +1,45 @@
 <script setup>
-import headerPage from "./components/header.vue";
-import { useRouter } from "vue-router";
-import { ref } from "@vue/reactivity";
-const router = useRouter();
-const showHeader = ref(false);
-const companyColor = ref('#7c7c7c');
-router.beforeEach((to, form,next) => {
-  console.log(to);
-  if (to.name == "login" || to.name == "register") {
-    showHeader.value = false;
+import headerPage from './components/header.vue'
+import { useRouter } from 'vue-router'
+import { ref } from '@vue/reactivity'
+const router = useRouter()
+const showHeader = ref(false)
+const companyColor = ref('#7c7c7c')
+router.beforeEach((to, form, next) => {
+  console.log(to)
+  if (to.name == 'login' || to.name == 'register') {
+    showHeader.value = false
   } else {
-    showHeader.value = true;
+    showHeader.value = true
   }
-  if (to.name == "home") {
-    companyColor.value = '#ffffff';
+  if (to.name == 'home') {
+    companyColor.value = '#ffffff'
   } else {
-    companyColor.value = '#7c7c7c';
+    companyColor.value = '#7c7c7c'
   }
-  next();
-});
+  next()
+})
 </script>
 
 <template>
   <headerPage v-show="showHeader"></headerPage>
   <router-view />
-  <div class="company" :style="{color:companyColor}">Copyright © 2022 XXXXXX有限公司</div>
+  <div class="company" :style="{ color: companyColor }">
+    Copyright © 2022 XXXXXX有限公司
+  </div>
 </template>
 
 <style lang="scss">
-@import "./common/public.scss";
+@import './common/public.scss';
+.m-2 {
+  .el-input__inner {
+    height: 50px !important;
+    font-size: 18px !important;
+    font-family: PingFang SC;
+    font-weight: 300;
+    color: #1a1a1a !important;
+  }
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -39,9 +50,10 @@ router.beforeEach((to, form,next) => {
   font-size: 18px;
   font-family: PingFang SC;
   font-weight: 300;
-  position: absolute;
+  position: fixed;
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 50;
 }
 </style>

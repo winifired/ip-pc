@@ -2,8 +2,8 @@
   <div class="login"></div>
 </template>
 <script setup>
-import { sidan } from "../utils/ribbon.js";
-sidan();
+import Ribbons from "../utils/ribbon.js";
+Ribbons;
 </script>
 <style lang="scss" scoped>
 .login {

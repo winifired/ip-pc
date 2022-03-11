@@ -22,8 +22,10 @@ router.beforeEach(to=>{
     chooseNav.value=1
   }else if(to.name=='nodePges'){
     chooseNav.value=2
-  }else if(to.name=='nodePges'){
-    chooseNav.value=2
+  }else if(to.name=='recharge'){
+    chooseNav.value=3
+  }else if(to.name=='user'){
+    chooseNav.value=4
   }
 })
 function toggelHeadNav(id) {
@@ -36,7 +38,10 @@ function toggelHeadNav(id) {
       router.push('/nodePges');
       break;
     case 3:
-      router.push('/nodePges');
+      router.push('/recharge');
+      break;
+    case 4:
+      router.push('/user/purchase');
       break;
   }
 }
@@ -57,7 +62,7 @@ function toggelHeadNav(id) {
           {{ item.name }}
         </li>
       </ul>
-      <div class="flex row-center font22 colorfff">
+      <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
         <img src="../assets/avatar.png" alt="" class="avatar" />
         逆臣
       </div>
