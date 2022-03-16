@@ -71,6 +71,8 @@ const choosePay = ref(1);
   width: 1230px;
   margin: 0 auto;
   padding: 45px 0 200px;
+  position: relative;
+  z-index: 3;
   .money {
     margin-top: 22px;
   }

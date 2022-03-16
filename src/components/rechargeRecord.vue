@@ -31,7 +31,6 @@ ul {
         }
 
         height: 100px;
-        border: 1px solid #ececec;
         padding: 13px 27px;
     }
     li:nth-child(2n) {

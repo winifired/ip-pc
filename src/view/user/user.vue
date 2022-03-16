@@ -8,17 +8,33 @@
             :key="item.id"
             class="font20 color000 cursor"
             :class="item.id == activedLi ? 'activedLi' : ''"
-            @click="activedLi = item.id"
+            @click="toggleActive(item.id)"
           >{{ item.name }}</li>
         </ul>
       </div>
-      <div class="right">
+      <div
+        class="right"
+        :style="{ gridTemplateRows: activedLi != 'commission' ? '200px calc(100% - 220px)' : '318px calc(100% - 338px)' }"
+      >
         <div class="title flexc column-bwn">
-          <div class="flex row-center userMsg">
-            <img src="../../assets/avatar.png" alt />
-            <div class="font20 color707">
-              <p>15896532121</p>
-              <p>代理商1</p>
+          <div class="flex area-between">
+            <div class="flex row-center userMsg">
+              <img src="../../assets/avatar.png" alt />
+              <div class="font20 color707">
+                <p>15896532121</p>
+                <p>代理商1</p>
+              </div>
+            </div>
+            <p class="font20 coloreff cursor" v-if="activedLi == 'commission'">复制链接</p>
+          </div>
+          <div class="flex numberToatal" v-if="activedLi == 'commission'">
+            <div class="flexc area-center colorfff">
+              <p class="font40">150.00</p>
+              <p class="font18">共获取佣金</p>
+            </div>
+            <div class="flexc area-center colorfff">
+              <p class="font40">10</p>
+              <p class="font18">推广人员</p>
             </div>
           </div>
           <div class="font20 color000">{{ titleMsgText }}</div>
@@ -40,16 +56,18 @@
             v-if="activedLi == 'expired' && !showPurchaseDetail"
             @titleMsg="titleMsg"
           ></expired>
-          <level
-            :offsetHeight="offsetHeight"
-            v-if="activedLi == 'level'"
-            @titleMsg="titleMsg"
-          ></level>
+          <level :offsetHeight="offsetHeight" v-if="activedLi == 'level'" @titleMsg="titleMsg"></level>
           <rechargeRecord
             :offsetHeight="offsetHeight"
             v-if="activedLi == 'rechargeRecord'"
             @titleMsg="titleMsg"
           ></rechargeRecord>
+          <changePassword v-if="activedLi == 'changePassword'" @titleMsg="titleMsg"></changePassword>
+          <commission
+            :offsetHeight="offsetHeight"
+            v-if="activedLi == 'commission'"
+            @titleMsg="titleMsg"
+          ></commission>
         </div>
       </div>
     </div>
@@ -65,6 +83,8 @@ const purchaseDetail = defineAsyncComponent(() => import("../../components/purch
 const expired = defineAsyncComponent(() => import("../../components/expired.vue"));
 const level = defineAsyncComponent(() => import("../../components/level.vue"));
 const rechargeRecord = defineAsyncComponent(() => import("../../components/rechargeRecord.vue"));
+const changePassword = defineAsyncComponent(() => import("../../components/changePassword.vue"));
+const commission = defineAsyncComponent(() => import("../../components/commission.vue"));
 
 const list = [
   { id: "purchase", name: "购买记录" }, //purchase
@@ -81,7 +101,7 @@ const activedLi = ref("purchase");
 const table = ref(null);
 const offsetHeight = ref(0);
 const showPurchaseDetail = ref(false);
-const titleMsgText = ref('购买记录');
+const titleMsgText = ref('');
 onMounted(() => {
   nextTick(() => {
     offsetHeight.value = table.value.offsetHeight - 50 + 'px';
@@ -95,9 +115,9 @@ watch(
     changeRouter(newData)
   }
 );
-watch(() => activedLi.value, (newData) => {
-  router.push('/user/' + newData)
-})
+function toggleActive(id) {
+  router.push('/user/' + id);
+}
 function changeRouter(newData) {
   if (newData != 'purchaseDetail') {
     showPurchaseDetail.value = false;

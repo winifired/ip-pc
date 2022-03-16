@@ -1,15 +1,20 @@
 <script setup>
 import headerPage from './components/header.vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref } from '@vue/reactivity'
 import { watch } from '@vue/runtime-core'
-const route = useRoute()
+const route = useRoute();
+const router=useRouter()
 const showHeader = ref(false)
 const companyColor = ref('#7c7c7c');
-watch(() => route.name,(newData) => {
+watch(() => route.name, (newData) => {
   if (newData == 'login' || newData == 'register') {
     showHeader.value = false
   } else {
+    showHeader.value = true
+    if (!localStorage.getItem('useridIp')) {
+      router.replace('/login')
+    }
     showHeader.value = true
   }
   if (newData == 'home') {
@@ -23,13 +28,11 @@ watch(() => route.name,(newData) => {
 <template>
   <headerPage v-show="showHeader"></headerPage>
   <router-view />
-  <div class="company" :style="{ color: companyColor }">
-    Copyright © 2022 XXXXXX有限公司
-  </div>
+  <div class="company" :style="{ color: companyColor }">Copyright © 2022 XXXXXX有限公司</div>
 </template>
 
 <style lang="scss">
-@import './common/public.scss';
+@import "./common/public.scss";
 .m-2 {
   .el-input__inner {
     height: 50px !important;
@@ -54,5 +57,11 @@ watch(() => route.name,(newData) => {
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
+}
+.el-input-number{
+  width:106px!important;
+}
+.el-input-number__decrease, .el-input-number__increase{
+  background: #fff!important;
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import {useRoute, useRouter} from "vue-router"
 const prop = defineProps({
   chooseHeadNav: {
@@ -15,6 +15,12 @@ const navbar = ref([
 const chooseNav = ref(prop.chooseHeadNav);
 const router=useRouter();
 const route=useRoute();
+const userinfo=ref(null);
+onMounted(()=>{
+  if(localStorage.getItem('useridIp')){
+    userinfo.value=localStorage.getItem('userinfoIp')
+  }
+})
 watch(() => route.name,(newData) => {
   if(newData=='home'){
     chooseNav.value=1
@@ -28,19 +34,14 @@ watch(() => route.name,(newData) => {
 })
 function toggelHeadNav(id) {
   chooseNav.value = id;
-  switch(chooseNav.value){
-    case 1:
-      router.push('/');
-      break;
-    case 2:
-      router.push('/nodePges');
-      break;
-    case 3:
-      router.push('/recharge');
-      break;
-    case 4:
-      router.push('/user/purchase');
-      break;
+  if(id==1){
+    router.push('/');
+  }else if(id==2){
+    router.push('/nodePges');
+  }else if(id==3){
+    router.push('/recharge');
+  }else if(id==4){
+    router.push('/user/purchase');
   }
 }
 </script>
@@ -61,8 +62,8 @@ function toggelHeadNav(id) {
         </li>
       </ul>
       <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
-        <img src="../assets/avatar.png" alt="" class="avatar" />
-        逆臣
+        <img :src="userinfo&&userinfo.avatar?userinfo.avatar:'../assets/avatar.png'" alt="" class="avatar" />
+        {{userinfo&&userinfo.nickname?userinfo.nickname:''}}
       </div>
     </div>
     <div style="height: 80px"></div>
@@ -78,7 +79,7 @@ function toggelHeadNav(id) {
   width: 100%;
   position: fixed;
   top: 0;
-  z-index: 20;
+  z-index: 50;
   .logo {
     width: 50px;
     height: 50px;
