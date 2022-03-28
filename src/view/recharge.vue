@@ -37,7 +37,7 @@
     </ul>
     <div class="flex area-between buyButton">
       <div class="font18 color000 flex row-center">
-        应付金币：
+        应付金额：
         <span class="color600 font22">{{ total }}</span>
         <div class="paytype">
           <el-radio v-model="paytype" label="1" size="large">
@@ -121,7 +121,7 @@ const ratio = ref(1);
 const list = ref([]);
 const inputNumber = ref('');
 const total = ref(0);
-const paytype = ref('1');
+const paytype = ref('2');
 const code_url = ref('');
 const modelPay = ref(false);
 const loading = ref(false);

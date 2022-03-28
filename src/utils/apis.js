@@ -16,5 +16,6 @@ const Apis = {
     renew:'/node/renew',
     export:'/node/export',
     wxpay:'/wxpay',
+    base:'/user/base',
 };
 export default Apis;

@@ -17,7 +17,7 @@
         :style="{ gridTemplateRows: activedLiItem != 'commission' ? '200px calc(100% - 220px)' : '318px calc(100% - 338px)' }"
       >
         <div class="title flexc column-bwn">
-          <div class="flex area-between">
+          <div class="flex area-between" v-if="userinfo">
             <div class="flex row-center userMsg">
               <img :src="userinfo.avatar" alt />
               <div class="font20 color707">
@@ -25,7 +25,11 @@
                 <p v-if="userinfo.level > 0">{{ userinfo.level_name }}</p>
               </div>
             </div>
-            <p class="font20 coloreff cursor" v-if="activedLiItem == 'commission'">复制链接</p>
+            <p
+              class="font20 coloreff cursor"
+              v-if="activedLiItem == 'commission'"
+              @click="copy"
+            >复制链接</p>
           </div>
           <div class="flex numberToatal" v-if="activedLiItem == 'commission'">
             <div class="flexc area-center colorfff">
@@ -82,7 +86,7 @@
 </template>
 <script setup>
 import { ref } from "@vue/reactivity";
-import { defineAsyncComponent, nextTick, watch } from "@vue/runtime-core";
+import { defineAsyncComponent, getCurrentInstance, nextTick, watch } from "@vue/runtime-core";
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const purchase = defineAsyncComponent(() => import("../../components/purchase.vue"));
@@ -92,18 +96,15 @@ const level = defineAsyncComponent(() => import("../../components/level.vue"));
 const rechargeRecord = defineAsyncComponent(() => import("../../components/rechargeRecord.vue"));
 const changePassword = defineAsyncComponent(() => import("../../components/changePassword.vue"));
 const commission = defineAsyncComponent(() => import("../../components/commission.vue"));
-const userinfo = JSON.parse(localStorage.getItem('userinfoIp'))
-const list = [
+const userinfo = ref(null);
+const list = ref([
   { id: "purchase", name: "购买记录" }, //purchase
   // { id: "commission", name: "推广返佣" }, //commission
   { id: "changePassword", name: "修改密码" }, //changePassword
   { id: "rechargeRecord", name: "充值记录" }, //rechargeRecord
   { id: "level", name: "代理等级" }, //level
   { id: "expired", name: "最近到期" }, //expired
-];
-if (userinfo.level > 0) {
-  list.splice(1,0,{ id: "commission", name: "推广返佣" })
-}
+]);
 const route = useRoute();
 const router = useRouter();
 const activedLi = ref('purchase');
@@ -112,11 +113,24 @@ const table = ref(null);
 const offsetHeight = ref(0);
 const titleMsgText = ref('');
 const commissionMsg = ref(null);
+const { proxy } = getCurrentInstance();
 onMounted(() => {
   nextTick(() => {
     offsetHeight.value = table.value.offsetHeight - 50 + 'px';
   });
-  changeRouter(route.params.name)
+  changeRouter(route.params.name);
+  proxy.$post(proxy.apis.base).then(res => {
+    console.log(res)
+    if (res.code == 1) {
+      userinfo.value = res.data.userinfo;
+      if (res.data.userinfo.level > 0) {
+        list.value.splice(1, 0, { id: "commission", name: "推广返佣" })
+      }
+      localStorage.setItem('userinfoIp', JSON.stringify(res.data.userinfo));
+    } else {
+      proxy.$message.error(res.msg)
+    }
+  })
 })
 watch(
   () => route.params.name,
@@ -157,6 +171,15 @@ const exportOp = () => {
   nextTick(() => {
     detailVue.value.exportVue();
   })
+}
+const copy = () => {
+  let oInput = document.createElement('input');
+  oInput.value = 'http://ip.hangdaokeji.com/#/register?prevUserId='+localStorage.getItem('useridIp');
+  document.body.appendChild(oInput);
+  oInput.select();
+  document.execCommand("Copy");
+  oInput.remove();
+  proxy.$message('复制成功')
 }
 </script>
 <style scoped lang="scss">

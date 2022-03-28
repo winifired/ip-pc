@@ -44,7 +44,6 @@ watch(() => route.name, (newData) => {
   -moz-osx-font-smoothing: grayscale;
 }
 .company {
-  margin-top: 20px;
   font-size: 18px;
   font-family: PingFang SC;
   font-weight: 300;

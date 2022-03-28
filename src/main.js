@@ -24,8 +24,6 @@ router.beforeEach((to, form, next) => {
 
 })
 const app = createApp(App);
-console.log(
-    import.meta.env)
 app.config.globalProperties.$post = post;
 app.config.globalProperties.$get = get;
 app.config.globalProperties.apis = apis;

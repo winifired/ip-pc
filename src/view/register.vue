@@ -33,14 +33,14 @@ import { particles } from "../utils/particles-config.js";
 import { User, Unlock, Check } from "@element-plus/icons-vue";
 import { ref } from "@vue/reactivity";
 import { getCurrentInstance } from "@vue/runtime-core";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const account = ref("");
 const password = ref("");
 const passwordreset = ref("");
 const router=useRouter();
+const route=useRoute();
 const { proxy } = getCurrentInstance();
-console.log(proxy)
 function confirm() {
   if (!account.value) {
     proxy.$message.error('请输入账号');
@@ -61,7 +61,7 @@ function confirm() {
   proxy.$post(proxy.apis.register, {
     mobile: account.value,
     password: password.value,
-    pid: ''
+    pid: route.query.prevUserId||''
   }).then(res => {
     console.log(res)
     if (res.code == 1) {
