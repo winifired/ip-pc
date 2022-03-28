@@ -12,10 +12,6 @@ watch(() => route.name, (newData) => {
     showHeader.value = false
   } else {
     showHeader.value = true
-    if (!localStorage.getItem('useridIp')) {
-      router.replace('/login')
-    }
-    showHeader.value = true
   }
   if (newData == 'home') {
     companyColor.value = '#ffffff'
@@ -26,7 +22,7 @@ watch(() => route.name, (newData) => {
 </script>
 
 <template>
-  <headerPage v-show="showHeader"></headerPage>
+  <headerPage v-if="showHeader"></headerPage>
   <router-view />
   <div class="company" :style="{ color: companyColor }">Copyright © 2022 XXXXXX有限公司</div>
 </template>

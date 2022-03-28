@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <Particles id="tsparticles" class="login__particles" :options="particles" />
-    <div class="content flex row-center">
+    <div class="content-login flex row-center">
       <h3>
         欢迎使用IP分配<span>管理系统</span>
       </h3>

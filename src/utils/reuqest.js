@@ -3,28 +3,53 @@ import qs from 'qs'
 import {
     ElMessage
 } from 'element-plus'
+import router from "../router";
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_HOST,
     timeout: 50000,
     headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'token':localStorage.getItem('userinfoIp')?.token
+        'Content-Type': 'application/x-www-form-urlencoded'
+    },
+});
+instance.interceptors.response.use(function (response) {
+    return response;
+}, function (error) {
+    if (error.response.status) {
+        switch (error.response.status) {
+            case 401:
+                ElMessage.error('未登录');
+                router.replace('/login')
+                break
+            case 404:
+                router.replace('/login')
+                break
+            default:
+                return Promise.reject(error);
+        }
+    }else{
+        return Promise.reject(error);
     }
+
 });
 const request = (url, options) => {
     return new Promise((resolve, reject) => {
-        instance({
+        instance.defaults.headers.common['token'] = localStorage.getItem('userinfoIp') ? JSON.parse(localStorage.getItem('userinfoIp')).token : '';
+        let data = {
             method: options.method,
             url: `${url}`,
-            data:qs.stringify(options.data)
-        }).then(value => {
+        }
+        if (options.method == 'get') {
+            data['params'] = options.data
+        } else {
+            data['data'] = qs.stringify(options.data)
+        }
+        instance(data).then(value => {
             if (value.status == 200) {
                 resolve(value.data)
             } else {
                 ElMessage.error(value.statusText);
             }
         }).catch(error => {
-            console.log(error)
             ElMessage.error('请求超时，请稍后重试');
             reject(error)
         })
@@ -45,12 +70,6 @@ export const post = (url, options = {}) => {
 export const put = (url, options = {}) => {
     return request(url, {
         method: 'put',
-        data: options
-    })
-}
-export const remove = (url, options = {}) => {
-    return request(url, {
-        method: 'delete',
         data: options
     })
 }

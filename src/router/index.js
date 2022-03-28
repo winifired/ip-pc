@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 const routes = [{
     path: "/user/:name",
     name: "user",
@@ -32,7 +32,7 @@ const routes = [{
 }];
 // process.env.BASE_URL
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes,
 });
 

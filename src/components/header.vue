@@ -1,6 +1,28 @@
+<template>
+  <div>
+    <div class="flex area-between header">
+      <img src="../assets/avatar.png" alt class="logo" />
+      <ul class="flex area-between">
+        <li
+          v-for="item in navbar"
+          :key="item.id"
+          :class="chooseNav == item.id ? 'actived' : ''"
+          class="cursor"
+          @click="toggelHeadNav(item.id)"
+        >{{ item.name }}</li>
+      </ul>
+      <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
+        <img :src="userinfo.avatar" alt class="avatar" v-if="userinfo && userinfo.avatar" />
+        <img src="../assets/avatar.png" alt class="avatar" v-else />
+        {{ userinfo && userinfo.nickname ? userinfo.nickname : '' }}
+      </div>
+    </div>
+    <div style="height: 80px"></div>
+  </div>
+</template>
 <script setup>
 import { onMounted, ref, watch } from "vue";
-import {useRoute, useRouter} from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 const prop = defineProps({
   chooseHeadNav: {
     type: [Number, String],
@@ -13,63 +35,43 @@ const navbar = ref([
   { id: 3, name: "充值" },
 ]);
 const chooseNav = ref(prop.chooseHeadNav);
-const router=useRouter();
-const route=useRoute();
-const userinfo=ref(null);
-onMounted(()=>{
-  if(localStorage.getItem('useridIp')){
-    userinfo.value=localStorage.getItem('userinfoIp')
+const router = useRouter();
+const route = useRoute();
+const userinfo = ref(null);
+onMounted(() => {
+  if (localStorage.getItem('useridIp')) {
+    userinfo.value = JSON.parse(localStorage.getItem('userinfoIp'))
   }
+  showPage(route.name)
 })
-watch(() => route.name,(newData) => {
-  if(newData=='home'){
-    chooseNav.value=1
-  }else if(newData=='nodePges'){
-    chooseNav.value=2
-  }else if(newData=='recharge'){
-    chooseNav.value=3
-  }else if(newData=='user'){
-    chooseNav.value=4
+watch(() => route.name, (newData) => {
+  console.log(newData)
+  showPage(newData)
+})
+function showPage(name) {
+  if (name == 'home') {
+    chooseNav.value = 1
+  } else if (name == 'nodePges') {
+    chooseNav.value = 2
+  } else if (name == 'recharge') {
+    chooseNav.value = 3
+  } else if (name == 'user') {
+    chooseNav.value = 4
   }
-})
+}
 function toggelHeadNav(id) {
   chooseNav.value = id;
-  if(id==1){
+  if (id == 1) {
     router.push('/');
-  }else if(id==2){
+  } else if (id == 2) {
     router.push('/nodePges');
-  }else if(id==3){
+  } else if (id == 3) {
     router.push('/recharge');
-  }else if(id==4){
+  } else if (id == 4) {
     router.push('/user/purchase');
   }
 }
 </script>
-
-<template>
-  <div>
-    <div class="flex area-between header">
-      <img src="../assets/avatar.png" alt="" class="logo" />
-      <ul class="flex area-between">
-        <li
-          v-for="item in navbar"
-          :key="item.id"
-          :class="chooseNav == item.id ? 'actived' : ''"
-          class="cursor"
-          @click="toggelHeadNav(item.id)"
-        >
-          {{ item.name }}
-        </li>
-      </ul>
-      <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
-        <img :src="userinfo&&userinfo.avatar?userinfo.avatar:'../assets/avatar.png'" alt="" class="avatar" />
-        {{userinfo&&userinfo.nickname?userinfo.nickname:''}}
-      </div>
-    </div>
-    <div style="height: 80px"></div>
-  </div>
-</template>
-
 <style scoped lang="scss">
 .header {
   height: 80px;
@@ -118,6 +120,7 @@ function toggelHeadNav(id) {
     width: 50px;
     height: 50px;
     margin-right: 18px;
+    border-radius: 50%;
   }
 }
 </style>

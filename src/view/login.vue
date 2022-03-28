@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <Particles id="tsparticles" class="login__particles" :options="particles" />
-    <div class="content flex row-center">
+    <div class="content-login flex row-center">
       <h3>
         欢迎使用IP分配
         <span>管理系统</span>
@@ -12,7 +12,7 @@
       </div>
       <div class="flex row-center input">
         <Unlock class="icon" color="#A8A8A8" />
-        <input type="text" placeholder="请输入密码" v-model="password" class="font20" />
+        <input type="password" placeholder="请输入密码" v-model="password" class="font20" />
       </div>
       <div class="readPass" style="margin-top:0;">
         <div class="flex font20 cursor" @click="checked = !checked">

@@ -1,34 +1,59 @@
 <template>
-  <div class="content">
+  <div class="content-recharge">
     <p class="font18 colorb2b">当前金币余额</p>
-    <p class="font34 color000 money">150.00</p>
+    <p class="font34 color000 money">{{ userMoney }}</p>
     <p class="font18 colorb2b title">充值套餐</p>
     <ul class="flex ul">
       <li
-        v-for="(item, index) in 16"
+        v-for="(item, index) in list"
         :key="index"
         class="flexc row-center cursor"
         :class="chooseItem == index ? 'chooseItem' : ''"
         @click="chooseItem = index"
       >
-        <p class="font30 color000">150.00</p>
+        <p class="font30 color000">{{ item.gold }}</p>
         <div class="flex font18 color505 sell">
-          <p class="delate">￥30.00</p>
-          <p>￥15.00</p>
+          <p class="delate">￥{{ item.ol_price }}</p>
+          <p>￥{{ item.price }}</p>
         </div>
       </li>
-      <li class="flexc row-center">
-        <p class="font30 color000">自定义</p>
+      <li
+        class="flexc row-center"
+        @click="chooseItem = list.length + 1"
+        :class="chooseItem == list.length + 1 ? 'chooseItem' : ''"
+      >
+        <p>
+          <input
+            type="number"
+            placeholder="自定义"
+            class="font30 color000"
+            v-model.number="inputNumber"
+          />
+        </p>
         <div class="flex font18 color505 sell">
-          <p>￥0.00</p>
+          <p>￥{{ (inputNumber / ratio).toFixed(2) }}</p>
         </div>
       </li>
     </ul>
     <div class="flex area-between buyButton">
-      <p class="font18 color000">
-        应付金币：<span class="color600 font22">150.00</span>
-      </p>
-      <button class="font20 colorfff" @click="confirm">购买</button>
+      <div class="font18 color000 flex row-center">
+        应付金币：
+        <span class="color600 font22">{{ total }}</span>
+        <div class="paytype">
+          <el-radio v-model="paytype" label="1" size="large">
+            <p class="flex row-center radioImg">
+              <img src="../assets/wx.png" alt />微信支付
+            </p>
+          </el-radio>
+          <el-radio v-model="paytype" label="2" size="large">
+            <p class="flex row-center radioImg">
+              <img src="../assets/zfb.png" alt />支付宝支付
+            </p>
+          </el-radio>
+        </div>
+      </div>
+      <button class="font20 colorfff" @click="confirm" v-if="!loading">购买</button>
+      <el-button class="font20 colorfff" color="#ff9600;" style="color:#ffffff" v-else :loading="loading">购买</el-button>
     </div>
   </div>
   <el-dialog
@@ -41,16 +66,24 @@
   >
     <template #title>
       <div class="flex nav">
-        <p class="flex area-center font20 color000 cursor" :class="choosePay==1?'choosePay':''" @click="choosePay=1">
-          <img src="../assets/wx.png" alt="" />微信支付
+        <p
+          class="flex area-center font20 color000 cursor"
+          :class="choosePay == 1 ? 'choosePay' : ''"
+          @click="choosePay = 1"
+        >
+          <img src="../assets/wx.png" alt />微信支付
         </p>
-        <p class="flex area-center font20 color000 cursor" :class="choosePay==2?'choosePay':''" @click="choosePay=2">
-          <img src="../assets/zfb.png" alt="" />支付宝支付
+        <p
+          class="flex area-center font20 color000 cursor"
+          :class="choosePay == 2 ? 'choosePay' : ''"
+          @click="choosePay = 2"
+        >
+          <img src="../assets/zfb.png" alt />支付宝支付
         </p>
       </div>
     </template>
     <div>
-      <img src="../assets/code.png" alt="" class="code" />
+      <img src="../assets/code.png" alt class="code" />
     </div>
     <template #footer>
       <div class="buttons flex">
@@ -59,15 +92,113 @@
       </div>
     </template>
   </el-dialog>
+  <el-dialog
+    v-model="modelPay"
+    width="500px"
+    title="微信扫码支付"
+    :show-close="false"
+    :close-on-click-modal="false"
+    center
+  >
+    <div class="acea-row row-center-wrapper">
+      <!-- <qrcode-vue :value="code_url" level="H" id="qrcode" size="200"></qrcode-vue> -->
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="paySure()">关闭</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 <script setup>
 import { ref } from '@vue/reactivity'
+import { getCurrentInstance, onMounted, watch } from '@vue/runtime-core';
 const dialogVisible = ref(false)
 const chooseItem = ref(0);
 const choosePay = ref(1);
+const userMoney = ref(0);
+const ratio = ref(1);
+const list = ref([]);
+const inputNumber = ref('');
+const total = ref(0);
+const paytype = ref('1');
+const code_url = ref('');
+const modelPay = ref(false);
+const loading = ref(false);
+const { proxy } = getCurrentInstance();
+onMounted(() => {
+  getData()
+});
+const getData = () => {
+  proxy.$get(proxy.apis.recharge).then(res => {
+    if (res.code == 1) {
+      list.value = res.data.list;
+      userMoney.value = res.data.money;
+      ratio.value = res.data.ratio;
+      total.value = res.data.list.length > 0 ? list.value[0].price : 0
+    }
+  })
+}
+watch(() => inputNumber.value, (newData) => {
+  total.value = (newData / ratio.value).toFixed(2)
+})
+watch(() => chooseItem.value, (newData) => {
+  if (newData == list.value.length + 1) {
+    total.value = inputNumber.value ? (inputNumber.value / ratio.value).toFixed(2) : 0
+  } else {
+    total.value = list.value[newData].price
+  }
+});
+const confirm = () => {
+  let data = {
+    pay_type: paytype.value,//类型(1=微信,2=支付宝)
+    status: chooseItem.value == list.value.length + 1 ? 2 : 1,//类型(1=套餐,2=自定义)
+    id: chooseItem.value == list.value.length + 1 ? '' : list.value[chooseItem.value].id,//套餐id
+    gold: chooseItem.value == list.value.length + 1 ? inputNumber.value : '',//自定义金币
+  }
+  if (data.status == 2 && !data.gold) {
+    proxy.$message.error('请输入自定义金币金额');
+    return;
+  }
+  loading.value = true;
+  proxy.$post(proxy.apis.pay, data).then(res => {
+    if (res.code == 1) {
+      pay(res.data.id)
+    } else {
+      loading.value = false;
+      proxy.$message.error(res.msg)
+    }
+  })
+}
+const pay = (id) => {
+  proxy.$post(proxy.apis.wxpay, {
+    id
+  }).then(res => {
+    if (res.code == 1) {
+      if (paytype.value == 2) {
+        let htmls = res.data; //打开新页面
+        // window.open(routerData.href, "_blank");
+        const div = document.createElement("div");
+        div.innerHTML = htmls;
+        document.body.appendChild(div);
+        document.forms[0].submit();
+      } else {
+        code_url.value = res.data;
+        modelPay.value = true;
+      }
+      loading.value = false;
+    } else {
+      loading.value = false;
+      proxy.$message.error(res.msg)
+    }
+  })
+}
+const paySure = () => {
+  modelPay.value = false;
+}
 </script>
 <style scoped lang="scss">
-.content {
+.content-recharge {
   width: 1230px;
   margin: 0 auto;
   padding: 45px 0 200px;
@@ -98,6 +229,10 @@ const choosePay = ref(1);
           text-decoration: line-through;
         }
       }
+      input {
+        width: 200px;
+        text-align: center;
+      }
     }
     li:not(:nth-child(4n)) {
       margin-right: 18px;
@@ -114,5 +249,10 @@ const choosePay = ref(1);
     z-index: 10;
     padding-bottom: 40px;
   }
+}
+.radioImg img {
+  width: 28px;
+  height: 25px;
+  margin-right: 10px;
 }
 </style>
