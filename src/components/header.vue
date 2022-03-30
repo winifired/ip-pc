@@ -15,6 +15,11 @@
         <img :src="userinfo.avatar" alt class="avatar" v-if="userinfo && userinfo.avatar" />
         <img src="../assets/avatar.png" alt class="avatar" v-else />
         {{ userinfo && userinfo.nickname ? userinfo.nickname : '' }}
+        <span
+          v-if="userinfo"
+          class="font18 yue"
+        >余额：{{}}</span>
+        <span v-if="userid" class="font18 yue" @click="loginout">退出</span>
       </div>
     </div>
     <div style="height: 80px"></div>
@@ -22,54 +27,64 @@
 </template>
 <script setup>
 import { onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router";
 const prop = defineProps({
   chooseHeadNav: {
     type: [Number, String],
-    default: 1,
-  },
+    default: 1
+  }
 });
 const navbar = ref([
   { id: 1, name: "首页" },
-  { id: 2, name: "节点" },
-  { id: 3, name: "充值" },
+  { id: 2, name: "节点购买" },
+  { id: 4, name: "个人中心" },
+  { id: 3, name: "充值" }
 ]);
 const chooseNav = ref(prop.chooseHeadNav);
 const router = useRouter();
 const route = useRoute();
 const userinfo = ref(null);
+const userid = ref(localStorage.getItem("useridIp"));
 onMounted(() => {
-  if (localStorage.getItem('useridIp')) {
-    userinfo.value = JSON.parse(localStorage.getItem('userinfoIp'))
+  if (localStorage.getItem("useridIp")) {
+    userinfo.value = JSON.parse(localStorage.getItem("userinfoIp"));
   }
-  showPage(route.name)
-})
-watch(() => route.name, (newData) => {
-  console.log(newData)
-  showPage(newData)
-})
+  showPage(route.name);
+});
+watch(
+  () => route.name,
+  newData => {
+    console.log(newData);
+    showPage(newData);
+  }
+);
 function showPage(name) {
-  if (name == 'home') {
-    chooseNav.value = 1
-  } else if (name == 'nodePges') {
-    chooseNav.value = 2
-  } else if (name == 'recharge') {
-    chooseNav.value = 3
-  } else if (name == 'user') {
-    chooseNav.value = 4
+  if (name == "home") {
+    chooseNav.value = 1;
+  } else if (name == "nodePges") {
+    chooseNav.value = 2;
+  } else if (name == "recharge") {
+    chooseNav.value = 3;
+  } else if (name == "user") {
+    chooseNav.value = 4;
   }
 }
 function toggelHeadNav(id) {
   chooseNav.value = id;
   if (id == 1) {
-    router.push('/');
+    router.push("/");
   } else if (id == 2) {
-    router.push('/nodePges');
+    router.push("/nodePges");
   } else if (id == 3) {
-    router.push('/recharge');
+    router.push("/recharge");
   } else if (id == 4) {
-    router.push('/user/purchase');
+    router.push("/user/purchase");
   }
+}
+function loginout() {
+  localStorage.removeItem("useridIp");
+  localStorage.removeItem("userinfoIp");
+  router.replace("/login");
 }
 </script>
 <style scoped lang="scss">
@@ -91,12 +106,12 @@ function toggelHeadNav(id) {
     height: 80px;
   }
   li {
-    font-size: 24px;
+    font-size: 20px;
     font-family: PingFang SC;
     font-weight: 300;
     color: rgba(255, 255, 255, 0.9);
     line-height: 83px;
-    width: 82px;
+    min-width: 82px;
     text-align: center;
     position: relative;
     height: 100%;
@@ -113,7 +128,7 @@ function toggelHeadNav(id) {
   }
   .actived {
     color: #ffffff !important;
-    font-size: 26px !important;
+    font-size: 24px !important;
     font-weight: 500;
   }
   .avatar {
@@ -121,6 +136,9 @@ function toggelHeadNav(id) {
     height: 50px;
     margin-right: 18px;
     border-radius: 50%;
+  }
+  .yue {
+    margin-left: 8px;
   }
 }
 </style>

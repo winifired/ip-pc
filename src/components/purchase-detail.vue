@@ -136,7 +136,17 @@ const confirmExport = () => {
     multipleSelection.value.map(item => {
         arr.push(item.id)
     })
-    location.href = import.meta.env.VITE_API_HOST + proxy.apis.export + '?ids=' + arr.join(',') + '&token=' + JSON.parse(localStorage.getItem('userinfoIp')).token;
+    // proxy.$post(proxy.apis.export, {
+    //     ids: arr.join(','),//节点id
+    // }).then(res => {
+    //     if (res.code == 1) {
+    //         // proxy.$message(res.msg)
+    //         // getData()
+    //     } else {
+    //         proxy.$message.error(res.msg)
+    //     }
+    // })
+    // location.href = import.meta.env.VITE_API_HOST + proxy.apis.export + '?ids=' + arr.join(',') + '&token=' + JSON.parse(localStorage.getItem('userinfoIp')).token;
 
 }
 defineExpose({

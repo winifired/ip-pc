@@ -1,6 +1,6 @@
 <template>
     <el-table :data="tableData" size="large" :max-height="offsetHeight">
-        <el-table-column prop="title" label="标题" width="245" align="center" />
+        <el-table-column prop="title" label="游戏项目" width="245" align="center" />
         <el-table-column prop="num" label="节点数" width="100" align="center" />
         <el-table-column prop="price" label="金币" width="100" align="center" />
         <el-table-column prop="expiretime" label="到期时间" width="242" align="center" />
