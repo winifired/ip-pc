@@ -36,10 +36,9 @@
       </div>
     </div>
   </div>
-  <realMsg></realMsg>
 </template>
 <script setup>
-import realMsg from "../components/realMsg.vue"
+
 import { particles } from "../utils/ribbon.js";
 </script>
 <style lang="scss" scoped>

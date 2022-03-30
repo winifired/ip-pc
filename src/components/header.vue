@@ -14,11 +14,13 @@
       <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
         <img :src="userinfo.avatar" alt class="avatar" v-if="userinfo && userinfo.avatar" />
         <img src="../assets/avatar.png" alt class="avatar" v-else />
-        {{ userinfo && userinfo.nickname ? userinfo.nickname : '' }}
-        <span
-          v-if="userinfo"
-          class="font18 yue"
-        >余额：{{}}</span>
+        <div>
+          {{ userinfo && userinfo.nickname ? userinfo.nickname : '' }}
+          <p
+            v-if="userinfo"
+            class="font18"
+          >余额：{{ }}</p>
+        </div>
         <span v-if="userid" class="font18 yue" @click="loginout">退出</span>
       </div>
     </div>
@@ -138,7 +140,7 @@ function loginout() {
     border-radius: 50%;
   }
   .yue {
-    margin-left: 8px;
+    margin-left: 12px;
   }
 }
 </style>

@@ -6,7 +6,7 @@
       :model="ruleForm"
       status-icon
       :rules="rules"
-      label-width="120px"
+      label-width="80px"
       class="demo-ruleForm"
     >
       <el-form-item label="姓名" prop="name">
@@ -20,7 +20,7 @@
       </el-form-item>
       <el-form-item label="验证码" prop="code">
         <el-input v-model="ruleForm.code" autocomplete="off" size="large" class="input" />
-        <el-button type="primary" size="large">{{btnCode}}</el-button>
+        <el-button type="primary" size="large" :loading="loadingbtn" @click="getCode">{{ btnCode }}</el-button>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -30,15 +30,24 @@
       </span>
     </template>
   </el-dialog>
-  <el-dialog v-model="innerVisible" width="30%" title="发送验证码" custom-class="realmsg">
-    <!-- <el-input v-model="ruleForm.code" autocomplete="off" size="large" class="input" /> -->
-    <canvasCode />
+  <el-dialog v-model="innerVisible" width="600px" title="发送验证码" custom-class="realmsg" destroy-on-close>
+    <div class="flex area-center">
+      <el-input v-model="codeCanvasTxt" autocomplete="off" size="large" class="input" />
+      <canvasCode @canvasText="canvasText" />
+    </div>
+    <template #footer>
+      <div class="flex area-center btnsCanvas">
+      <el-button type="primary" @click="confirmCanvas()" size="large">确认</el-button>
+      <el-button @click="innerVisible = false;codeCanvasTxt=''" size="large">取消</el-button>
+    </div>
+    </template>
   </el-dialog>
   <el-dialog
     v-model="dialogFormVisiblezfb"
     width="450px"
     custom-class="realmsgzfb"
     :showClose="false"
+    before-close="beforeClose"
   >
     <div class="headTitle flex area-center">
       <img src="../assets/zfb.svg" alt />
@@ -56,12 +65,17 @@
 
 <script setup>
 import canvasCode from "../components/canvasCode.vue";
-import { reactive, ref } from "vue";
-const innerVisible = ref(true);
-const dialogFormVisible = ref(false);
+import { getCurrentInstance, reactive, ref } from "vue";
+const { proxy } = getCurrentInstance();
+const innerVisible = ref(false);
+const dialogFormVisible = ref(true);
 const dialogFormVisiblezfb = ref(false);
 const ruleFormRef = ref(null);
 const btnCode = ref("获取验证码");
+const setCanvasText = ref('');//canvas 图形验证
+const codeCanvasTxt = ref('');
+const onlineCode = ref('');//服务器返回验证码
+const loadingbtn = ref(false);
 const validatename = (rule, value, callback) => {
   console.log(rule, value);
   if (value === "") {
@@ -74,7 +88,7 @@ const validateID = (rule, value, callback) => {
   let reg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
   if (value === "") {
     callback(new Error("请输入身份证号"));
-  } else if (!reg.test()) {
+  } else if (!reg.test(value)) {
     callback(new Error("身份证号错误"));
   } else {
     callback();
@@ -84,8 +98,17 @@ const validatephone = (rule, value, callback) => {
   let reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
   if (value === "") {
     callback(new Error("请输入手机号"));
-  } else if (!reg.test()) {
+  } else if (!reg.test(value)) {
     callback(new Error("手机号错误"));
+  } else {
+    callback();
+  }
+};
+const validatecode = (rule, value, callback) => {
+  if (value === "") {
+    callback(new Error("请输入验证码"));
+  } else if (value != onlineCode.value) {
+    callback(new Error("验证码错误"));
   } else {
     callback();
   }
@@ -99,20 +122,43 @@ const ruleForm = reactive({
 const rules = reactive({
   name: [{ validator: validatename, trigger: "blur" }],
   cardID: [{ validator: validateID, trigger: "blur" }],
-  phone: [{ validator: validatephone, trigger: "blur" }]
+  phone: [{ validator: validatephone, trigger: "blur" }],
+  code: [{ validator: validatecode, trigger: "blur" }],
 });
-
 const submitForm = formEl => {
   console.log(formEl);
   if (!formEl) return;
   formEl.validate(valid => {
     if (valid) {
+      console.log(valid)
       //   ``````````````
     } else {
       return false;
     }
   });
 };
+const canvasText = (data) => {
+  setCanvasText.value = data;
+}
+const getCode = () => {
+  // 获取验证码前需要通过数字验证码验证
+  innerVisible.value = true;
+}
+const confirmCanvas = () => {
+  console.log(codeCanvasTxt.value)
+  console.log(setCanvasText.value)
+  if (codeCanvasTxt.value != setCanvasText.value) {
+    proxy.$message.error('图形验证码错误')
+  } else {
+    codeCanvasTxt.value="";
+    innerVisible.value = false;
+    loadingbtn.value=true;
+    // 获取服务器密码
+  }
+}
+const beforeClose = () => {
+  console.log('询问是否已实名')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -126,7 +172,7 @@ const submitForm = formEl => {
   margin-bottom: 20px;
 }
 .input {
-  width: 280px;
+  width: 260px;
   margin-right: 20px;
 }
 .headTitle {
