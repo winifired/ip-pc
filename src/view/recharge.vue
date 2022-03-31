@@ -115,6 +115,7 @@
 import realMsg from "../components/realMsg.vue"
 import { ref } from '@vue/reactivity'
 import { getCurrentInstance, onMounted, watch } from '@vue/runtime-core';
+import { useStore } from "vuex";
 const dialogVisible = ref(false)
 const chooseItem = ref(0);
 const choosePay = ref(1);
@@ -128,8 +129,10 @@ const code_url = ref('');
 const modelPay = ref(false);
 const loading = ref(false);
 const { proxy } = getCurrentInstance();
+const store=useStore();
 onMounted(() => {
-  getData()
+  getData();
+  getuserinfo();
 });
 const getData = () => {
   proxy.$get(proxy.apis.recharge).then(res => {
@@ -188,6 +191,7 @@ const pay = (id) => {
         code_url.value = res.data;
         modelPay.value = true;
       }
+      getuserinfo();
       loading.value = false;
     } else {
       loading.value = false;
@@ -197,6 +201,17 @@ const pay = (id) => {
 }
 const paySure = () => {
   modelPay.value = false;
+}
+const getuserinfo=()=>{
+  proxy.$post(proxy.apis.base).then(res => {
+    console.log(res)
+    if (res.code == 1) {
+      store.commit('setUserinfo',res.data.userinfo)
+      localStorage.setItem('userinfoIp', JSON.stringify(res.data.userinfo));
+    } else {
+      proxy.$message.error(res.msg)
+    }
+  })
 }
 </script>
 <style scoped lang="scss">

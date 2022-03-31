@@ -37,10 +37,12 @@ import { User, Unlock, Check } from "@element-plus/icons-vue";
 import { ref } from "@vue/reactivity";
 import { getCurrentInstance, watch } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 const account = ref("");
 const password = ref("");
 const checked = ref(false);
 const router=useRouter();
+const store=useStore();
 const { proxy } = getCurrentInstance();
 watch(() => account.value, () => {
   if (localStorage.getItem(account.value + 'Ip')) {
@@ -67,7 +69,8 @@ function confirm() {
         localStorage.setItem(account.value + 'Ip', window.btoa(password.value))
       }
       proxy.$message.success('登录成功');
-      localStorage.setItem('useridIp',res.data.userinfo.id)
+      localStorage.setItem('useridIp',res.data.userinfo.id);
+      store.commit('setUserinfo',res.data.userinfo);
       localStorage.setItem('userinfoIp', JSON.stringify(res.data.userinfo))
       router.replace('/');
     } else {

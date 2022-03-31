@@ -63,6 +63,17 @@ watch(
 .el-input-number__increase {
   background: #fff !important;
 }
+.realmsgxieyi{
+  .el-dialog__header {
+    padding:0!important;
+  }
+  .el-dialog__body {
+    padding: 20px 30px !important;
+  }
+  .el-button > span {
+    font-size: 14px !important;
+  }
+}
 .realmsg {
   .el-dialog__header {
     border-bottom: 1px solid #f7f7f7;

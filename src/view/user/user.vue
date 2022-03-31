@@ -43,7 +43,10 @@
           </div>
           <div class="font20 color000 flex area-between">
             <p>{{ titleMsgText }}</p>
-            <div class="flex column-end btns" v-if="activedLiItem == 'purchaseDetail'">
+            <div
+              class="flex column-end btns"
+              v-if="activedLiItem == 'purchaseDetail'||activedLiItem=='expired'"
+            >
               <button @click="extendOp">续费IP</button>
               <button @click="exportOp">导出</button>
             </div>
@@ -64,6 +67,7 @@
           <expired
             :offsetHeight="offsetHeight"
             v-if="activedLiItem == 'expired'"
+            ref="expiredVue"
             @titleMsg="titleMsg"
           ></expired>
           <level :offsetHeight="offsetHeight" v-if="activedLiItem == 'level'" @titleMsg="titleMsg"></level>
@@ -79,6 +83,10 @@
             @titleMsg="titleMsg"
             @numberMsg="numberMsg"
           ></commission>
+          <realUser :offsetHeight="offsetHeight"
+          :real_name="real_name"
+            v-if="activedLiItem == 'realUser'"
+            @titleMsg="titleMsg"></realUser>
         </div>
       </div>
     </div>
@@ -86,101 +94,143 @@
 </template>
 <script setup>
 import { ref } from "@vue/reactivity";
-import { defineAsyncComponent, getCurrentInstance, nextTick, watch } from "@vue/runtime-core";
+import {
+  defineAsyncComponent,
+  getCurrentInstance,
+  nextTick,
+  watch
+} from "@vue/runtime-core";
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-const purchase = defineAsyncComponent(() => import("../../components/purchase.vue"));
-const purchaseDetail = defineAsyncComponent(() => import("../../components/purchase-detail.vue"));
-const expired = defineAsyncComponent(() => import("../../components/expired.vue"));
+import { useStore } from "vuex";
+const purchase = defineAsyncComponent(() =>
+  import("../../components/purchase.vue")
+);
+const purchaseDetail = defineAsyncComponent(() =>
+  import("../../components/purchase-detail.vue")
+);
+const expired = defineAsyncComponent(() =>
+  import("../../components/expired.vue")
+);
 const level = defineAsyncComponent(() => import("../../components/level.vue"));
-const rechargeRecord = defineAsyncComponent(() => import("../../components/rechargeRecord.vue"));
-const changePassword = defineAsyncComponent(() => import("../../components/changePassword.vue"));
-const commission = defineAsyncComponent(() => import("../../components/commission.vue"));
+const rechargeRecord = defineAsyncComponent(() =>
+  import("../../components/rechargeRecord.vue")
+);
+const changePassword = defineAsyncComponent(() =>
+  import("../../components/changePassword.vue")
+);
+const commission = defineAsyncComponent(() =>
+  import("../../components/commission.vue")
+);
+const realUser = defineAsyncComponent(() =>
+  import("../../components/realMsg.vue")
+);
 const userinfo = ref(null);
 const list = ref([
   { id: "purchase", name: "购买记录" }, //purchase
   // { id: "commission", name: "推广返佣" }, //commission
   { id: "changePassword", name: "修改密码" }, //changePassword
   { id: "rechargeRecord", name: "充值记录" }, //rechargeRecord
-  { id: "level", name: "代理等级" }, //level
+  // { id: "level", name: "代理等级" }, //level
   { id: "expired", name: "最近到期" }, //expired
+  { id: "realUser", name: "实名认证" },
 ]);
 const route = useRoute();
 const router = useRouter();
-const activedLi = ref('purchase');
-const activedLiItem = ref('purchase');
+const activedLi = ref("purchase");
+const activedLiItem = ref("purchase");
 const table = ref(null);
 const offsetHeight = ref(0);
-const titleMsgText = ref('');
+const titleMsgText = ref("");
 const commissionMsg = ref(null);
+const store=useStore();
+const real_name=ref('');
 const { proxy } = getCurrentInstance();
 onMounted(() => {
   nextTick(() => {
-    offsetHeight.value = table.value.offsetHeight - 50 + 'px';
+    offsetHeight.value = table.value.offsetHeight - 50 + "px";
   });
   changeRouter(route.params.name);
   proxy.$post(proxy.apis.base).then(res => {
-    console.log(res)
+    console.log(res);
     if (res.code == 1) {
+      real_name.value=res.data.real_name;
       userinfo.value = res.data.userinfo;
       if (res.data.userinfo.level > 0) {
-        list.value.splice(1, 0, { id: "commission", name: "推广返佣" })
+        list.value.splice(1, 0, { id: "commission", name: "推广返佣" });
+        list.value.splice(4, 0, { id: "level", name: "代理等级" });
       }
-      localStorage.setItem('userinfoIp', JSON.stringify(res.data.userinfo));
+      store.commit('setUserinfo',res.data.userinfo);
+      localStorage.setItem("userinfoIp", JSON.stringify(res.data.userinfo));
     } else {
-      proxy.$message.error(res.msg)
+      proxy.$message.error(res.msg);
     }
-  })
-})
+  });
+});
 watch(
   () => route.params.name,
-  (newData) => {
-    changeRouter(newData)
+  newData => {
+    changeRouter(newData);
   }
 );
 
 function toggleActive(id) {
-  router.push('/user/' + id);
+  router.push("/user/" + id);
 }
 function changeRouter(newData) {
   activedLiItem.value = newData;
-  if (newData != 'purchaseDetail') {
+  if (newData != "purchaseDetail") {
     activedLi.value = newData;
   } else {
-    if (localStorage.getItem('userTabr') == 'purchase') {
-      activedLi.value = 'purchase';
-    } else if (localStorage.getItem('userTabr') == 'expired') {
-      activedLi.value = 'expired';
+    if (localStorage.getItem("userTabr") == "purchase") {
+      activedLi.value = "purchase";
+    } else if (localStorage.getItem("userTabr") == "expired") {
+      activedLi.value = "expired";
     }
   }
-  localStorage.setItem('userTabr', activedLi.value);
+  localStorage.setItem("userTabr", activedLi.value);
 }
 function titleMsg(msg) {
-  titleMsgText.value = msg
+  titleMsgText.value = msg;
 }
 function numberMsg(msg) {
-  commissionMsg.value = msg
-};
+  commissionMsg.value = msg;
+}
 const detailVue = ref(null);
+const expiredVue = ref(null);
 const extendOp = () => {
-  nextTick(() => {
-    detailVue.value.extendVue();
-  })
-}
+  if (activedLiItem.value == "expired") {
+    nextTick(() => {
+      expiredVue.value.extendOp();
+    });
+  } else {
+    nextTick(() => {
+      detailVue.value.extendVue();
+    });
+  }
+};
 const exportOp = () => {
-  nextTick(() => {
-    detailVue.value.exportVue();
-  })
-}
+  if (activedLiItem.value == "expired") {
+    nextTick(() => {
+      expiredVue.value.exportOp();
+    });
+  } else {
+    nextTick(() => {
+      detailVue.value.exportVue();
+    });
+  }
+};
 const copy = () => {
-  let oInput = document.createElement('input');
-  oInput.value = 'http://ip.hangdaokeji.com/#/register?prevUserId='+localStorage.getItem('useridIp');
+  let oInput = document.createElement("input");
+  oInput.value =
+    "http://ip.hangdaokeji.com/#/register?prevUserId=" +
+    localStorage.getItem("useridIp");
   document.body.appendChild(oInput);
   oInput.select();
   document.execCommand("Copy");
   oInput.remove();
-  proxy.$message('复制成功')
-}
+  proxy.$message("复制成功");
+};
 </script>
 <style scoped lang="scss">
 @import "../../common/user.scss";

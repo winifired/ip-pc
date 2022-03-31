@@ -17,5 +17,7 @@ const Apis = {
     export:'/node/export',
     wxpay:'/wxpay',
     base:'/user/base',
+    sms:'/alipay/sms',
+    alipayindex:'/alipay/index',
 };
 export default Apis;

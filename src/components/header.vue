@@ -11,18 +11,28 @@
           @click="toggelHeadNav(item.id)"
         >{{ item.name }}</li>
       </ul>
-      <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
-        <img :src="userinfo.avatar" alt class="avatar" v-if="userinfo && userinfo.avatar" />
-        <img src="../assets/avatar.png" alt class="avatar" v-else />
-        <div>
-          {{ userinfo && userinfo.nickname ? userinfo.nickname : '' }}
-          <p
-            v-if="userinfo"
-            class="font18"
-          >余额：{{ }}</p>
-        </div>
-        <span v-if="userid" class="font18 yue" @click="loginout">退出</span>
-      </div>
+      <el-popover
+        placement="bottom"
+        :width="150"
+        trigger="hover"
+      >
+        <template #reference>
+          <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
+            <img :src="userinfo.avatar" alt class="avatar" v-if="userinfo && userinfo.avatar" />
+            <img src="../assets/avatar.png" alt class="avatar" v-else />
+            <div>
+              {{ userinfo && userinfo.nickname ? userinfo.nickname : '' }}
+              <p v-if="userinfo" class="font16">余额：{{ userinfo.money}}</p>
+            </div>
+          </div>
+        </template>
+        <template #default>
+          <div class="flex area-center outlogin font24 cursor" @click="loginout">
+            <img src="../assets/outlogin.svg" alt="">
+            退出登录
+          </div>
+        </template>
+      </el-popover>
     </div>
     <div style="height: 80px"></div>
   </div>
@@ -30,6 +40,7 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
 const prop = defineProps({
   chooseHeadNav: {
     type: [Number, String],
@@ -46,10 +57,12 @@ const chooseNav = ref(prop.chooseHeadNav);
 const router = useRouter();
 const route = useRoute();
 const userinfo = ref(null);
-const userid = ref(localStorage.getItem("useridIp"));
+const store=useStore();
+console.log(store.state.userinfo)
+const userid = ref(store.state.userinfo);
 onMounted(() => {
-  if (localStorage.getItem("useridIp")) {
-    userinfo.value = JSON.parse(localStorage.getItem("userinfoIp"));
+  if (store.state.userinfo) {
+    userinfo.value = store.state.userinfo;
   }
   showPage(route.name);
 });
@@ -143,4 +156,11 @@ function loginout() {
     margin-left: 12px;
   }
 }
+.outlogin{
+    img{
+      width:20px;
+      height:20px;
+      margin-right:10px;
+    }
+  }
 </style>
