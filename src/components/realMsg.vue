@@ -1,6 +1,5 @@
 <template>
   <div class="realMsg" v-if="userinfo">
-    <!-- userinfo -->
     <div class="msg font16">
       <p>1、未认证用户无法进行其他操作</p>
       <p>2、修改手机需要重新实名制认证</p>
@@ -10,7 +9,7 @@
       <p>根据《中华人民共和国网络安全法》第24条要求，您需要进行实名认证才能继续使用我们的产品和服务，请您尽快完成实名认证，感谢您的理解和支持。</p>
       <p>提示：所有产品已经对接日志系统！实时监控访问记录，严禁从事违法违规活动，异常数据自动上报</p>
     </div>
-    <el-button type="primary" size="large" v-if="userinfo.verification==0" @click="showxieyi">实名认证</el-button>
+    <el-button type="primary" size="large" v-if="userinfo.verification == 0" @click="showxieyi">实名认证</el-button>
     <div class="successReal" v-else>
       <span>已实名认证</span> 实名认证无法修改，需要修改实名认证请联系管理员
     </div>
@@ -26,7 +25,15 @@
       </span>
     </template>
   </el-dialog>
-  <el-dialog v-model="dialogFormVisible" title="实名认证信息" width="600px" custom-class="realmsg">
+  <el-dialog
+    v-model="dialogFormVisible"
+    title="实名认证信息"
+    width="600px"
+    custom-class="realmsg"
+    destroy-on-close
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <div class="tip">填写的身份信息需要和支付宝身份验证信息一致</div>
     <el-form
       ref="ruleFormRef"
@@ -68,6 +75,8 @@
     title="发送验证码"
     custom-class="realmsg"
     destroy-on-close
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <div class="flex area-center">
       <el-input v-model="codeCanvasTxt" autocomplete="off" size="large" class="input" />
@@ -76,7 +85,7 @@
     <template #footer>
       <div class="flex area-center btnsCanvas">
         <el-button type="primary" @click="confirmCanvas()" size="large">确认</el-button>
-        <el-button @click="innerVisible = false;codeCanvasTxt=''" size="large">取消</el-button>
+        <el-button @click="innerVisible = false; codeCanvasTxt = ''" size="large">取消</el-button>
       </div>
     </template>
   </el-dialog>
@@ -84,8 +93,8 @@
     v-model="dialogFormVisiblezfb"
     width="450px"
     custom-class="realmsgzfb"
-    :showClose="false"
-    before-close="beforeClose"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
   >
     <div class="headTitle flex area-center">
       <img src="../assets/zfb.svg" alt />
@@ -96,14 +105,17 @@
     </div>
     <div class="zfbcode">
       <div class="tips">请用支付宝扫码继续身份验证</div>
-      <div class="code"></div>
+      <div class="code flex column-center">
+        <qrcode-vue :value="text" :size="350" level="H" :margin="12" />
+      </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup>
+import QrcodeVue from 'qrcode.vue'
 import canvasCode from "../components/canvasCode.vue";
-import { getCurrentInstance, onMounted, reactive, ref } from "vue";
+import { getCurrentInstance, nextTick, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 const prop = defineProps({
   real_name: {
@@ -123,12 +135,16 @@ const setCanvasText = ref(""); //canvas 图形验证
 const codeCanvasTxt = ref("");
 const onlineCode = ref(""); //服务器返回验证码
 const loadingbtn = ref(false);
-const timer=ref(null);
-const codeNum=ref(60);
+const timer = ref(null);
+const codeNum = ref(60);
 const xieyi = ref(false);
 const userinfo = ref(store.state.userinfo);
+const text = ref('');//人脸二维码
+const certify_id = ref('');//人脸识别编号
+const timerrenlian = ref(null);//人脸识别定时器
 const getCanvasCode = ref(false); //true 输入canvas验证码
 onMounted(() => {
+  clearInterval(timerrenlian.value);
   emit("titleMsg", "实名认证");
 });
 const showxieyi = () => {
@@ -140,44 +156,44 @@ const confirmxieyi = () => {
   dialogFormVisible.value = true;
 };
 const validatename = (rule, value, callback) => {
-  // if (value === "") {
-  //   callback(new Error("请输入姓名"));
-  // } else {
-  callback();
-  // }
+  if (value === "") {
+    callback(new Error("请输入姓名"));
+  } else {
+    callback();
+  }
 };
 const validateID = (rule, value, callback) => {
-  // let reg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
-  // if (value === "") {
-  //   callback(new Error("请输入身份证号"));
-  // } else if (!reg.test(value)) {
-  //   callback(new Error("身份证号错误"));
-  // } else {
-  callback();
-  // }
+  let reg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
+  if (value === "") {
+    callback(new Error("请输入身份证号"));
+  } else if (!reg.test(value)) {
+    callback(new Error("身份证号错误"));
+  } else {
+    callback();
+  }
 };
 const validatephone = (rule, value, callback) => {
-  // let reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
-  // if (value === "") {
-  //   callback(new Error("请输入手机号"));
-  // } else if (!reg.test(value)) {
-  //   callback(new Error("手机号错误"));
-  // } else {
-  callback();
-  // }
+  let reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+  if (value === "") {
+    callback(new Error("请输入手机号"));
+  } else if (!reg.test(value)) {
+    callback(new Error("手机号错误"));
+  } else {
+    callback();
+  }
 };
 const validatecode = (rule, value, callback) => {
-  // if (getCanvasCode.value) {
-  callback();
-  // } else {
-  //   if (value === "") {
-  //     callback(new Error("请输入验证码"));
-  //   } else if (value != onlineCode.value) {
-  //     callback(new Error("验证码错误"));
-  //   } else {
-  callback();
-  // }
-  // }
+  if (getCanvasCode.value) {
+    callback();
+  } else {
+    if (value === "") {
+      callback(new Error("请输入验证码"));
+    } else if (value != onlineCode.value) {
+      callback(new Error("验证码错误"));
+    } else {
+      callback();
+    }
+  }
 };
 const ruleForm = reactive({
   name: "",
@@ -196,7 +212,6 @@ const submitForm = formEl => {
   if (!formEl) return;
   formEl.validate(valid => {
     if (valid) {
-      console.log(valid);
       proxy
         .$post(proxy.apis.alipayindex, {
           certName: ruleForm.name,
@@ -206,18 +221,36 @@ const submitForm = formEl => {
         .then(res => {
           console.log(res);
           if (res.code == 1) {
-            // data.from
-            // onlineCode.value = res.data.code;
+            certify_id.value = res.data.certify_id;
+            text.value = res.data.from;
+            dialogFormVisiblezfb.value = true;
+            timerrenlian.value = setInterval(() => {
+              getzfbresult()
+            }, 3000)
           } else {
             proxy.$message.error(res.msg);
           }
         });
-      //   ``````````````
     } else {
       return false;
     }
   });
 };
+const getzfbresult = () => {
+  proxy
+    .$get(proxy.apis.certify, {
+      certify_id: certify_id.value,
+    })
+    .then(res => {
+      console.log(res);
+      if (res.code == 1) {
+        dialogFormVisible.value = false;
+        dialogFormVisiblezfb.value = false;
+        userbase();
+        clearInterval(timerrenlian.value);
+      }
+    });
+}
 const canvasText = data => {
   setCanvasText.value = data;
 };
@@ -258,21 +291,30 @@ const confirmCanvas = () => {
       });
   }
 };
-const setTime=()=>{
-  timer.value=setInterval(()=>{
-    if(codeNum.value>1){
+const setTime = () => {
+  timer.value = setInterval(() => {
+    if (codeNum.value > 1) {
       codeNum.value--;
-      btnCode.value=codeNum.value+'s';
-    }else{
-      codeNum.value=60;
-      btnCode.value='获取验证码';
+      btnCode.value = codeNum.value + 's';
+    } else {
+      codeNum.value = 60;
+      btnCode.value = '获取验证码';
       clearInterval(timer.value);
     }
-  },1000)
+  }, 1000)
 }
-const beforeClose = () => {
-  console.log("询问是否已实名");
-};
+function userbase() {
+  proxy.$post(proxy.apis.base).then(res => {
+    console.log(res);
+    if (res.code == 1) {
+      userinfo.value = res.data.userinfo;
+      store.commit('setUserinfo', res.data.userinfo);
+      localStorage.setItem("userinfoIp", JSON.stringify(res.data.userinfo));
+    } else {
+      proxy.$message.error(res.msg);
+    }
+  });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -321,11 +363,7 @@ const beforeClose = () => {
     color: #fff;
   }
   .code {
-    border: 1px solid #fff;
-    padding: 12px;
-    margin: 15px auto 0;
-    width: 400px;
-    height: 400px;
+    margin: 30px auto 0;
   }
 }
 .realMsg {

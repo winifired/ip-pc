@@ -14,7 +14,6 @@
       <template #default="scope">{{scope.row.day}}天</template>
     </el-table-column>
   </el-table>
-  <a href="http://ip.hangdaokeji.com/uploads/node/13612345678.txt" download="12">下载</a>
   <el-dialog
     v-model="dialogVisible"
     width="800px"

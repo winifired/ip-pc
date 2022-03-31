@@ -41,12 +41,12 @@ import { useStore } from "vuex";
 const account = ref("");
 const password = ref("");
 const checked = ref(false);
-const router=useRouter();
-const store=useStore();
+const router = useRouter();
+const store = useStore();
 const { proxy } = getCurrentInstance();
 watch(() => account.value, () => {
   if (localStorage.getItem(account.value + 'Ip')) {
-    checked.value=true;
+    checked.value = true;
     password.value = window.atob(localStorage.getItem(account.value + 'Ip'))
   }
 })
@@ -69,10 +69,14 @@ function confirm() {
         localStorage.setItem(account.value + 'Ip', window.btoa(password.value))
       }
       proxy.$message.success('登录成功');
-      localStorage.setItem('useridIp',res.data.userinfo.id);
-      store.commit('setUserinfo',res.data.userinfo);
-      localStorage.setItem('userinfoIp', JSON.stringify(res.data.userinfo))
-      router.replace('/');
+      localStorage.setItem('useridIp', res.data.userinfo.id);
+      store.commit('setUserinfo', res.data.userinfo);
+      localStorage.setItem('userinfoIp', JSON.stringify(res.data.userinfo));
+      if (res.data.userinfo.verification == 0) {
+        router.replace('/user/realUser');
+      } else {
+        router.replace('/');
+      }
     } else {
       proxy.$message.error(res.msg)
     }

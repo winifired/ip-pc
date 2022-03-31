@@ -19,5 +19,6 @@ const Apis = {
     base:'/user/base',
     sms:'/alipay/sms',
     alipayindex:'/alipay/index',
+    certify:'/alipay/certify',
 };
 export default Apis;

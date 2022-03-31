@@ -20,13 +20,17 @@ instance.interceptors.response.use(function (response) {
                 ElMessage.error('未登录');
                 router.replace('/login')
                 break
+            case 12:
+                ElMessage.error('未实名认证');
+                router.replace('/user/realUser')
+                break
             case 404:
                 router.replace('/login')
                 break
             default:
                 return Promise.reject(error);
         }
-    }else{
+    } else {
         return Promise.reject(error);
     }
 

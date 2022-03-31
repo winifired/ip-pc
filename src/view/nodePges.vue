@@ -117,10 +117,8 @@
       </div>
     </template>
   </el-dialog>
-  <realMsg></realMsg>
 </template>
 <script setup>
-import realMsg from "../components/realMsg.vue"
 import { ref } from '@vue/reactivity'
 import { computed, getCurrentInstance, onMounted, watch } from '@vue/runtime-core'
 
