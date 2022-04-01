@@ -119,167 +119,200 @@
   </el-dialog>
 </template>
 <script setup>
-import { ref } from '@vue/reactivity'
-import { computed, getCurrentInstance, onMounted, watch } from '@vue/runtime-core'
+import { ref } from "@vue/reactivity";
+import {
+  computed,
+  getCurrentInstance,
+  onMounted,
+  watch
+} from "@vue/runtime-core";
+import { useStore } from "vuex";
 
 const { proxy } = getCurrentInstance();
 const form = ref({
   classify: 0,
   onlineServe: 0,
-  game_id: '',
-  city_id: ''
-})
-const loading=ref(true);
-const dayBuy = ref([]);//时间列表
-const chooseDayBuy = ref();//选中的时间
-const chooseDayBuyId = ref();//选中的时间id
-const classifyList = ref([{
-  id: 1,
-  name: '静态'
-}, {
-  id: 2,
-  name: '动态'
-}, {
-  id: 3,
-  name: '全国'
-}])
-const onlineServeList = ref([{
-  id: 2,
-  name: '联通'
-}, {
-  id: 1,
-  name: '电信'
-}]);
-const page = ref(1)
-const gameList = ref([]);//游戏列表
-const cityList = ref([]);//城市列表
-const list = ref([]);//节点列表
+  game_id: "",
+  city_id: ""
+});
+const loading = ref(true);
+const dayBuy = ref([]); //时间列表
+const chooseDayBuy = ref(); //选中的时间
+const chooseDayBuyId = ref(); //选中的时间id
+const classifyList = ref([
+  {
+    id: 1,
+    name: "静态"
+  },
+  {
+    id: 2,
+    name: "动态"
+  },
+  {
+    id: 3,
+    name: "全国"
+  }
+]);
+const onlineServeList = ref([
+  {
+    id: 2,
+    name: "联通"
+  },
+  {
+    id: 1,
+    name: "电信"
+  }
+]);
+const page = ref(1);
+const gameList = ref([]); //游戏列表
+const cityList = ref([]); //城市列表
+const list = ref([]); //节点列表
 const total = ref(0);
-const chooseItem = ref('');//选中的节点
-const chooseStoce = ref('');//选中的节点购买数量
+const chooseItem = ref(""); //选中的节点
+const chooseStoce = ref(""); //选中的节点购买数量
 const dialogVisible = ref(false);
 const totalPrice = ref(0);
-const isClick=ref(false);
-const disabledScroll=ref(false);
+const isClick = ref(false);
+const disabledScroll = ref(false);
+const store = useStore();
 onMounted(() => {
   getSerach();
-})
+});
 function getSerach() {
   proxy.$get(proxy.apis.getSerach).then(res => {
     gameList.value = res.data.game;
-    cityList.value = [{ id: 0, name: '全国' }, ...res.data.city];
+    cityList.value = [{ id: 0, name: "全国" }, ...res.data.city];
     if (res.data.game.length > 0) {
       form.value.game_id = res.data.game[0].id;
     }
     if (res.data.game.length > 0) {
       form.value.city_id = cityList.value[0].id;
     }
-  })
+  });
 }
 function getNodeList() {
-  console.log(form.value)
+  console.log(form.value);
   if (page.value == 1) {
-    list.value = []
+    list.value = [];
   }
-  proxy.$get(proxy.apis.nodeIndex, {
-    city_id: form.value.city_id,//地址id
-    game_id: form.value.game_id,//游戏id
-    isp: form.value.onlineServe,//运营商(1=电信,2=联通)
-    status: form.value.classify,//节点分类(1=静态,2=动态,3=全国)
-    page: page.value,//当前页
-    pageSize: 25,//每页数量
-  }).then(res => {
-    dayBuy.value = res.data.price;
-    chooseDayBuy.value = res.data.price[0].name;
-    chooseDayBuyId.value = res.data.price[0].id;
-    total.value = res.data.total;
-    if (res.data.list.length > 0) {
-      res.data.list.map(item => {
-        item['elseStock'] = (item.stock-0)>0?1:0;
-        list.value.push(item);
-      })
-      let havestock=res.data.list.findIndex(item=>item.stock>0)
-      chooseItem.value = havestock?res.data.list[havestock].id:'';
-      chooseStoce.value =havestock?res.data.list[havestock].stock:'';
-    }
-    loading.value=false
-  }).catch(()=>{
-    loading.value=false
-  })
+  proxy
+    .$get(proxy.apis.nodeIndex, {
+      city_id: form.value.city_id, //地址id
+      game_id: form.value.game_id, //游戏id
+      isp: form.value.onlineServe, //运营商(1=电信,2=联通)
+      status: form.value.classify, //节点分类(1=静态,2=动态,3=全国)
+      page: page.value, //当前页
+      pageSize: 25 //每页数量
+    })
+    .then(res => {
+      dayBuy.value = res.data.price;
+      chooseDayBuy.value = res.data.price[0].name;
+      chooseDayBuyId.value = res.data.price[0].id;
+      total.value = res.data.total;
+      if (res.data.list.length > 0) {
+        res.data.list.map(item => {
+          item["elseStock"] = item.stock - 0 > 0 ? 1 : 0;
+          list.value.push(item);
+        });
+        let havestock = res.data.list.findIndex(item => item.stock > 0);
+        chooseItem.value = havestock ? res.data.list[havestock].id : "";
+        chooseStoce.value = havestock ? res.data.list[havestock].stock : "";
+      }
+      loading.value = false;
+    })
+    .catch(() => {
+      loading.value = false;
+    });
 }
 const nodePrice = computed(() => {
   return {
     chooseItem: chooseItem.value,
     chooseDayBuy: chooseDayBuy.value
-  }
-})
-const elseStockChange = (value) => {
-  const timeItem = dayBuy.value.find(item => item.name == chooseDayBuy.value);
-  totalPrice.value = (value - 0) * (timeItem.price - 0)
-}
-watch(() => form.value, () => {
-  chooseItem.value = '';
-  chooseStoce.value = '';
-  totalPrice.value = 0;
-  page.value=1;
-  getNodeList();
-}, {
-  deep: true
-})
-watch(() => nodePrice.value, (newData) => {
-  const timeItem = dayBuy.value.find(item => item.name == newData.chooseDayBuy);
-  chooseDayBuyId.value = timeItem.id;
-  const nodeItem = list.value.find(item => item.id == newData.chooseItem);
-  if (!nodeItem) {
-    return
   };
-  chooseStoce.value = nodeItem.elseStock;
-  totalPrice.value = (nodeItem.elseStock - 0) * (timeItem.price - 0)
 });
+const elseStockChange = value => {
+  const timeItem = dayBuy.value.find(item => item.name == chooseDayBuy.value);
+  totalPrice.value = (value - 0) * (timeItem.price - 0);
+};
+watch(
+  () => form.value,
+  () => {
+    chooseItem.value = "";
+    chooseStoce.value = "";
+    totalPrice.value = 0;
+    page.value = 1;
+    getNodeList();
+  },
+  {
+    deep: true
+  }
+);
+watch(
+  () => nodePrice.value,
+  newData => {
+    const timeItem = dayBuy.value.find(
+      item => item.name == newData.chooseDayBuy
+    );
+    chooseDayBuyId.value = timeItem.id;
+    const nodeItem = list.value.find(item => item.id == newData.chooseItem);
+    if (!nodeItem) {
+      return;
+    }
+    chooseStoce.value = nodeItem.elseStock;
+    totalPrice.value = (nodeItem.elseStock - 0) * (timeItem.price - 0);
+  }
+);
 function confirm() {
   if (!chooseItem.value) {
-    proxy.$message.error('请选择节点');
+    proxy.$message.error("请选择节点");
     return;
   }
   dialogVisible.value = true;
 }
 const confirmPay = () => {
   // 购买
-  isClick.value=true;
-  proxy.$post(proxy.apis.nodeBuy, {
-    id: chooseItem.value,//节点id
-    game_id:form.value.game_id,//游戏id
-    price_id: chooseDayBuyId.value,//套餐id
-    num: chooseStoce.value,//购买数量
-  }).then(res => {
-    dialogVisible.value = false;
-    if (res.code == 1) {
-      page.value=1;
-      getNodeList();
-      proxy.$message.success(res.msg)
-    }else{
-      proxy.$message.error(res.msg)
+  isClick.value = true;
+  proxy
+    .$post(proxy.apis.nodeBuy, {
+      id: chooseItem.value, //节点id
+      game_id: form.value.game_id, //游戏id
+      price_id: chooseDayBuyId.value, //套餐id
+      num: chooseStoce.value //购买数量
+    })
+    .then(res => {
+      dialogVisible.value = false;
+      if (res.code == 1) {
+        page.value = 1;
+        store.dispatch("updateUserinfo").catch(err => {
+          proxy.$message.error(err);
+        });
+        getNodeList();
+        proxy.$message.success(res.msg);
+      } else {
+        proxy.$message.error(res.msg);
+      }
+    });
+};
+watch(
+  () => dialogVisible.value,
+  newData => {
+    if (!newData) {
+      isClick.value = false;
     }
-  })
-}
-watch(()=>dialogVisible.value,(newData)=>{
-  if(!newData){
-    isClick.value=false;
   }
-})
+);
 function toggleItem(id) {
   // 节点切换
   chooseItem.value = id;
 }
 function bottomFixed() {
   if (total.value == list.value.length) {
-    disabledScroll.value=true;
+    disabledScroll.value = true;
     return;
   } else {
     page.value++;
     getNodeList();
   }
-  
 }
 </script>
 <style scoped lang="scss">

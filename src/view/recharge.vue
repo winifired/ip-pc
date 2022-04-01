@@ -53,7 +53,13 @@
         </div>
       </div>
       <button class="font20 colorfff" @click="confirm" v-if="!loading">购买</button>
-      <el-button class="font20 colorfff" color="#ff9600;" style="color:#ffffff" v-else :loading="loading">购买</el-button>
+      <el-button
+        class="font20 colorfff"
+        color="#ff9600;"
+        style="color:#ffffff"
+        v-else
+        :loading="loading"
+      >购买</el-button>
     </div>
   </div>
   <el-dialog
@@ -111,26 +117,28 @@
   </el-dialog>
 </template>
 <script setup>
-import { ref } from '@vue/reactivity'
-import { getCurrentInstance, onMounted, watch } from '@vue/runtime-core';
+import { ref } from "@vue/reactivity";
+import { getCurrentInstance, onMounted, watch } from "@vue/runtime-core";
 import { useStore } from "vuex";
-const dialogVisible = ref(false)
+const dialogVisible = ref(false);
 const chooseItem = ref(0);
 const choosePay = ref(1);
 const userMoney = ref(0);
 const ratio = ref(1);
 const list = ref([]);
-const inputNumber = ref('');
+const inputNumber = ref("");
 const total = ref(0);
-const paytype = ref('2');
-const code_url = ref('');
+const paytype = ref("2");
+const code_url = ref("");
 const modelPay = ref(false);
 const loading = ref(false);
 const { proxy } = getCurrentInstance();
-const store=useStore();
+const store = useStore();
 onMounted(() => {
   getData();
-  getuserinfo();
+  store.dispatch("updateUserinfo").catch(err => {
+    proxy.$message.error(err);
+  });
 });
 const getData = () => {
   proxy.$get(proxy.apis.recharge).then(res => {
@@ -138,79 +146,83 @@ const getData = () => {
       list.value = res.data.list;
       userMoney.value = res.data.money;
       ratio.value = res.data.ratio;
-      total.value = res.data.list.length > 0 ? list.value[0].price : 0
+      total.value = res.data.list.length > 0 ? list.value[0].price : 0;
     }
-  })
-}
-watch(() => inputNumber.value, (newData) => {
-  total.value = (newData / ratio.value).toFixed(2)
-})
-watch(() => chooseItem.value, (newData) => {
-  if (newData == list.value.length + 1) {
-    total.value = inputNumber.value ? (inputNumber.value / ratio.value).toFixed(2) : 0
-  } else {
-    total.value = list.value[newData].price
+  });
+};
+watch(
+  () => inputNumber.value,
+  newData => {
+    total.value = (newData / ratio.value).toFixed(2);
   }
-});
+);
+watch(
+  () => chooseItem.value,
+  newData => {
+    if (newData == list.value.length + 1) {
+      total.value = inputNumber.value
+        ? (inputNumber.value / ratio.value).toFixed(2)
+        : 0;
+    } else {
+      total.value = list.value[newData].price;
+    }
+  }
+);
 const confirm = () => {
   let data = {
-    pay_type: paytype.value,//类型(1=微信,2=支付宝)
-    status: chooseItem.value == list.value.length + 1 ? 2 : 1,//类型(1=套餐,2=自定义)
-    id: chooseItem.value == list.value.length + 1 ? '' : list.value[chooseItem.value].id,//套餐id
-    gold: chooseItem.value == list.value.length + 1 ? inputNumber.value : '',//自定义金币
-  }
+    pay_type: paytype.value, //类型(1=微信,2=支付宝)
+    status: chooseItem.value == list.value.length + 1 ? 2 : 1, //类型(1=套餐,2=自定义)
+    id:
+      chooseItem.value == list.value.length + 1
+        ? ""
+        : list.value[chooseItem.value].id, //套餐id
+    gold: chooseItem.value == list.value.length + 1 ? inputNumber.value : "" //自定义金币
+  };
   if (data.status == 2 && !data.gold) {
-    proxy.$message.error('请输入自定义金币金额');
+    proxy.$message.error("请输入自定义金币金额");
     return;
   }
   loading.value = true;
   proxy.$post(proxy.apis.pay, data).then(res => {
     if (res.code == 1) {
-      pay(res.data.id)
+      pay(res.data.id);
     } else {
       loading.value = false;
-      proxy.$message.error(res.msg)
+      proxy.$message.error(res.msg);
     }
-  })
-}
-const pay = (id) => {
-  proxy.$post(proxy.apis.wxpay, {
-    id
-  }).then(res => {
-    if (res.code == 1) {
-      if (paytype.value == 2) {
-        let htmls = res.data; //打开新页面
-        // window.open(routerData.href, "_blank");
-        const div = document.createElement("div");
-        div.innerHTML = htmls;
-        document.body.appendChild(div);
-        document.forms[0].submit();
+  });
+};
+const pay = id => {
+  proxy
+    .$post(proxy.apis.wxpay, {
+      id
+    })
+    .then(res => {
+      if (res.code == 1) {
+        if (paytype.value == 2) {
+          let htmls = res.data; //打开新页面
+          // window.open(routerData.href, "_blank");
+          const div = document.createElement("div");
+          div.innerHTML = htmls;
+          document.body.appendChild(div);
+          document.forms[0].submit();
+        } else {
+          code_url.value = res.data;
+          modelPay.value = true;
+        }
+        store.dispatch("updateUserinfo").catch(err => {
+          proxy.$message.error(err);
+        });
+        loading.value = false;
       } else {
-        code_url.value = res.data;
-        modelPay.value = true;
+        loading.value = false;
+        proxy.$message.error(res.msg);
       }
-      getuserinfo();
-      loading.value = false;
-    } else {
-      loading.value = false;
-      proxy.$message.error(res.msg)
-    }
-  })
-}
+    });
+};
 const paySure = () => {
   modelPay.value = false;
-}
-const getuserinfo=()=>{
-  proxy.$post(proxy.apis.base).then(res => {
-    console.log(res)
-    if (res.code == 1) {
-      store.commit('setUserinfo',res.data.userinfo)
-      localStorage.setItem('userinfoIp', JSON.stringify(res.data.userinfo));
-    } else {
-      proxy.$message.error(res.msg)
-    }
-  })
-}
+};
 </script>
 <style scoped lang="scss">
 .content-recharge {

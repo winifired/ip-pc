@@ -49,6 +49,9 @@ const request = (url, options) => {
         }
         instance(data).then(value => {
             if (value.status == 200) {
+                if(value.data.code==12){
+                    router.replace('/user/realUser')
+                }
                 resolve(value.data)
             } else {
                 ElMessage.error(value.statusText);

@@ -83,6 +83,14 @@ watch(
     showPage(newData);
   }
 );
+watch(
+  () => store.state.userinfo,
+  newData => {
+    userinfo.value =newData
+  },{
+    deep:true
+  }
+);
 function showPage(name) {
   if (name == "home") {
     chooseNav.value = 1;
@@ -124,7 +132,7 @@ function loginout() {
   z-index: 50;
   .logo {
     width: 167px;
-    height: 41px;
+    height: 65px;
   }
   ul {
     width: 440px;
