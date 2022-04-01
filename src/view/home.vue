@@ -8,22 +8,30 @@
         随时为您保驾护航，多年的客服售后经验，能够迅速帮您解决加速遇到的问题
       </div>
       <div class="flex area-between urls">
-        <p class="flex area-center colorfff cursor font26">
-          Win10版
-          <img src="../assets/window.png" alt />
-        </p>
-        <p class="flex area-center colorfff cursor font26">
-          电脑端
-          <img src="../assets/window.png" alt />
-        </p>
-        <p class="flex area-center colorfff cursor font26">
-          安卓端
-          <img src="../assets/android.png" alt />
-        </p>
-        <p class="flex area-center colorfff cursor font26">
-          苹果端
-          <img src="../assets/ios.png" alt />
-        </p>
+        <a :href="info.length>0?info[0].url:''" download="畅享ip">
+          <p class="flex area-center colorfff cursor font26">
+            Win10版
+            <img src="../assets/window.png" alt />
+          </p>
+        </a>
+        <a :href="info.length>0?info[1].url:''" download="畅享ip">
+          <p class="flex area-center colorfff cursor font26">
+            电脑端
+            <img src="../assets/window.png" alt />
+          </p>
+        </a>
+        <a :href="info.length>0?info[2].url:''" download="畅享ip">
+          <p class="flex area-center colorfff cursor font26">
+            安卓端
+            <img src="../assets/android.png" alt />
+          </p>
+        </a>
+        <a :href="info.length>0?info[3].url:''" download="畅享ip">
+          <p class="flex area-center colorfff cursor font26">
+            苹果端
+            <img src="../assets/ios.png" alt />
+          </p>
+        </a>
       </div>
       <div class="colorfff font18">
         华为创立于1987年，是全球领先的ICT（信息与通信）基础设施和智能终端提供商。目前华为约有19.7万员工，业务遍及170多个国家和地区，服务全球30多亿人口。
@@ -38,8 +46,23 @@
   </div>
 </template>
 <script setup>
-
+import { getCurrentInstance, onMounted, ref } from "vue";
 import { particles } from "../utils/ribbon.js";
+const { proxy } = getCurrentInstance();
+const info = ref([]);
+onMounted(() => {
+  getData();
+});
+function getData() {
+  proxy.$post(proxy.apis.link).then(res => {
+    console.log(res);
+    if (res.code == 1) {
+      info.value = res.data.list;
+    } else {
+      proxy.$message.error(res.msg);
+    }
+  });
+}
 </script>
 <style lang="scss" scoped>
 .home {
