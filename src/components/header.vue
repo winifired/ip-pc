@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex area-between header">
-      <img src="../assets/avatar.png" alt class="logo" />
+      <img :src="logo" alt class="logo" />
       <ul class="flex area-between">
         <li
           v-for="item in navbar"
@@ -38,7 +38,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { getCurrentInstance, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 const prop = defineProps({
@@ -58,19 +58,34 @@ const router = useRouter();
 const route = useRoute();
 const userinfo = ref(null);
 const store=useStore();
-console.log(store.state.userinfo)
+const logo=ref('');
 const userid = ref(store.state.userinfo);
+const {proxy}=getCurrentInstance();
 onMounted(() => {
   if (store.state.userinfo) {
     userinfo.value = store.state.userinfo;
   }
   showPage(route.name);
+  proxy.$get(proxy.apis.link).then(res => {
+    if (res.code == 1) {
+      logo.value=res.data.logo;
+    } else {
+      proxy.$message.error(res.msg)
+    }
+  })
 });
 watch(
   () => route.name,
   newData => {
-    console.log(newData);
     showPage(newData);
+  }
+);
+watch(
+  () => store.state.userinfo,
+  newData => {
+    userinfo.value =newData
+  },{
+    deep:true
   }
 );
 function showPage(name) {
@@ -113,8 +128,8 @@ function loginout() {
   top: 0;
   z-index: 50;
   .logo {
-    width: 50px;
-    height: 50px;
+    width: 167px;
+    height: 65px;
   }
   ul {
     width: 440px;

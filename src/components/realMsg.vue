@@ -304,15 +304,10 @@ const setTime = () => {
   }, 1000)
 }
 function userbase() {
-  proxy.$post(proxy.apis.base).then(res => {
-    console.log(res);
-    if (res.code == 1) {
-      userinfo.value = res.data.userinfo;
-      store.commit('setUserinfo', res.data.userinfo);
-      localStorage.setItem("userinfoIp", JSON.stringify(res.data.userinfo));
-    } else {
-      proxy.$message.error(res.msg);
-    }
+  store.dispatch('updateUserinfo').then(res=>{
+    userinfo.value = res.userinfo;
+  }).catch(err=>{
+    proxy.$message.error(err);
   });
 }
 </script>

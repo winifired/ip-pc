@@ -128,8 +128,14 @@
   </el-dialog>
 </template>
 <script setup>
-import { ref } from '@vue/reactivity'
-import { computed, getCurrentInstance, onMounted, watch } from '@vue/runtime-core'
+import { ref } from "@vue/reactivity";
+import {
+  computed,
+  getCurrentInstance,
+  onMounted,
+  watch
+} from "@vue/runtime-core";
+import { useStore } from "vuex";
 
 const { proxy } = getCurrentInstance();
 const form = ref({
@@ -165,19 +171,19 @@ const game_name = ref('');
 const cityList = ref([]);//城市列表
 const list = ref([]);//节点列表
 const total = ref(0);
-const chooseItem = ref('');//选中的节点
-const chooseStoce = ref('');//选中的节点购买数量
+const chooseItem = ref(""); //选中的节点
+const chooseStoce = ref(""); //选中的节点购买数量
 const dialogVisible = ref(false);
 const totalPrice = ref(0);
 const isClick = ref(false);
 const disabledScroll = ref(false);
 onMounted(() => {
   getSerach();
-})
+});
 function getSerach() {
   proxy.$get(proxy.apis.getSerach).then(res => {
     gameList.value = res.data.game;
-    cityList.value = [{ id: 0, name: '全国' }, ...res.data.city];
+    cityList.value = [{ id: 0, name: "全国" }, ...res.data.city];
     if (res.data.game.length > 0) {
       form.value.game_id = res.data.game[0].id;
       game_name.value = res.data.game[0].name;
@@ -185,7 +191,7 @@ function getSerach() {
     if (res.data.game.length > 0) {
       form.value.city_id = cityList.value[0].id;
     }
-  })
+  });
 }
 const querySearchAsync = (queryString, cb) => {
   const results = queryString
@@ -207,7 +213,7 @@ const handleSelect = (item) => {
 }
 function getNodeList() {
   if (page.value == 1) {
-    list.value = []
+    list.value = [];
   }
   proxy.$get(proxy.apis.nodeIndex, {
     city_id: form.value.city_id,//地址id
@@ -241,10 +247,6 @@ const nodePrice = computed(() => {
     chooseDayBuy: chooseDayBuy.value
   }
 })
-const elseStockChange = (value) => {
-  const timeItem = dayBuy.value.find(item => item.name == chooseDayBuy.value);
-  totalPrice.value = (value - 0) * (timeItem.price - 0)
-}
 watch(() => form.value, () => {
   chooseItem.value = '';
   chooseStoce.value = '';
@@ -261,12 +263,42 @@ watch(() => nodePrice.value, (newData) => {
   if (!nodeItem) {
     return
   };
-  chooseStoce.value = nodeItem.elseStock;
-  totalPrice.value = (nodeItem.elseStock - 0) * (timeItem.price - 0)
 });
+const elseStockChange = value => {
+  const timeItem = dayBuy.value.find(item => item.name == chooseDayBuy.value);
+  totalPrice.value = (value - 0) * (timeItem.price - 0);
+};
+watch(
+  () => form.value,
+  () => {
+    chooseItem.value = "";
+    chooseStoce.value = "";
+    totalPrice.value = 0;
+    page.value = 1;
+    getNodeList();
+  },
+  {
+    deep: true
+  }
+);
+watch(
+  () => nodePrice.value,
+  newData => {
+    const timeItem = dayBuy.value.find(
+      item => item.name == newData.chooseDayBuy
+    );
+    chooseDayBuyId.value = timeItem.id;
+    const nodeItem = list.value.find(item => item.id == newData.chooseItem);
+    if (!nodeItem) {
+      return;
+    }
+    chooseStoce.value = nodeItem.elseStock;
+    totalPrice.value = (nodeItem.elseStock - 0) * (timeItem.price - 0);
+  }
+);
 function confirm() {
   if (!chooseItem.value) {
-    proxy.$message.error('请选择节点');
+    proxy.$message.error("请选择节点");
     return;
   }
   dialogVisible.value = true;
@@ -307,7 +339,6 @@ function bottomFixed() {
     page.value++;
     getNodeList();
   }
-
 }
 </script>
 <style scoped lang="scss">

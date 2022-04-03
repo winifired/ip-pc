@@ -56,6 +56,7 @@
 import { ref } from "@vue/reactivity";
 import { getCurrentInstance, onMounted, watch } from "@vue/runtime-core";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 
 const route = useRoute();
 const prop = defineProps({
@@ -74,6 +75,7 @@ const dialogVisible = ref(false);
 const chooseDayBuy = ref(); //选中的时间
 const chooseDayBuyId = ref(); //选中的时间id
 const totalPrice = ref(0);
+const store=useStore();
 onMounted(() => {
   if (prop.typenum == 1) {
     emit("titleMsg", "最近到期");
@@ -146,6 +148,9 @@ const confirm = () => {
       if (res.code == 1) {
         proxy.$message(res.msg);
         getData();
+        store.dispatch("updateUserinfo").catch(err => {
+          proxy.$message.error(err);
+        });
       } else {
         proxy.$message.error(res.msg);
       }

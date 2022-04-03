@@ -151,20 +151,15 @@ onMounted(() => {
     offsetHeight.value = table.value.offsetHeight - 50 + "px";
   });
   changeRouter(route.params.name);
-  proxy.$post(proxy.apis.base).then(res => {
-    console.log(res);
-    if (res.code == 1) {
-      real_name.value=res.data.real_name;
-      userinfo.value = res.data.userinfo;
-      if (res.data.userinfo.level > 0) {
+  store.dispatch('updateUserinfo').then(res=>{
+    userinfo.value = res.userinfo;
+    real_name.value = res.real_name;
+    if (res.userinfo.level > 0) {
         list.value.splice(1, 0, { id: "commission", name: "推广返佣" });
         list.value.splice(4, 0, { id: "level", name: "代理等级" });
       }
-      store.commit('setUserinfo',res.data.userinfo);
-      localStorage.setItem("userinfoIp", JSON.stringify(res.data.userinfo));
-    } else {
-      proxy.$message.error(res.msg);
-    }
+  }).catch(err=>{
+    proxy.$message.error(err);
   });
 });
 watch(
