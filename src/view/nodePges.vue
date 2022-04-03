@@ -30,9 +30,18 @@
       <div class="flex row-center fifltar">
         <div class="flex row-center">
           <p class="color000 font18">选择游戏：</p>
-          <el-select v-model="form.game_id" class="m-2" size="large" placeholder="请选择">
+          <el-autocomplete
+            class="m-2"
+            size="large"
+            v-model="game_name"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请选择游戏"
+            @select="handleSelect"
+            value-key="name"
+          />
+          <!-- <el-select v-model="form.game_id" placeholder="请选择">
             <el-option v-for="item in gameList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
+          </el-select>-->
         </div>
         <div class="flex row-center">
           <p class="color000 font18">选择地区：</p>
@@ -48,7 +57,7 @@
           v-for="item in list"
           :key="item.id"
           class="scrollbar-item flex column-bwn cursor"
-          :class="[chooseItem == item.id ? 'chosseItem' : '',item.stock<=0||!item.stock?'noClick':'']"
+          :class="[chooseItem == item.id ? 'chosseItem' : '', item.stock <= 0 || !item.stock ? 'noClick' : '']"
           @click="toggleItem(item.id, item.stock)"
         >
           <div class="name flex font20 color000 row-center">
@@ -113,7 +122,7 @@
     <template #footer>
       <div class="buttons flex">
         <p class="font20 color262 cursor" @click="dialogVisible = false">否</p>
-        <p class="font20 coloreff cursor" :class="isClick?'noClick':''" @click="confirmPay">是</p>
+        <p class="font20 coloreff cursor" :class="isClick ? 'noClick' : ''" @click="confirmPay">是</p>
       </div>
     </template>
   </el-dialog>
@@ -129,7 +138,7 @@ const form = ref({
   game_id: '',
   city_id: ''
 })
-const loading=ref(true);
+const loading = ref(true);
 const dayBuy = ref([]);//时间列表
 const chooseDayBuy = ref();//选中的时间
 const chooseDayBuyId = ref();//选中的时间id
@@ -152,6 +161,7 @@ const onlineServeList = ref([{
 }]);
 const page = ref(1)
 const gameList = ref([]);//游戏列表
+const game_name = ref('');
 const cityList = ref([]);//城市列表
 const list = ref([]);//节点列表
 const total = ref(0);
@@ -159,8 +169,8 @@ const chooseItem = ref('');//选中的节点
 const chooseStoce = ref('');//选中的节点购买数量
 const dialogVisible = ref(false);
 const totalPrice = ref(0);
-const isClick=ref(false);
-const disabledScroll=ref(false);
+const isClick = ref(false);
+const disabledScroll = ref(false);
 onMounted(() => {
   getSerach();
 })
@@ -170,14 +180,32 @@ function getSerach() {
     cityList.value = [{ id: 0, name: '全国' }, ...res.data.city];
     if (res.data.game.length > 0) {
       form.value.game_id = res.data.game[0].id;
+      game_name.value = res.data.game[0].name;
     }
     if (res.data.game.length > 0) {
       form.value.city_id = cityList.value[0].id;
     }
   })
 }
+const querySearchAsync = (queryString, cb) => {
+  const results = queryString
+    ? gameList.value.filter(createFilter(queryString))
+    : gameList.value
+  cb(results)
+}
+const createFilter = (queryString) => {
+  return (restaurant) => {
+    return (
+      restaurant.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+    )
+  }
+}
+
+const handleSelect = (item) => {
+  form.value.game_id = item.id;
+  game_name.value = item.name;
+}
 function getNodeList() {
-  console.log(form.value)
   if (page.value == 1) {
     list.value = []
   }
@@ -195,16 +223,16 @@ function getNodeList() {
     total.value = res.data.total;
     if (res.data.list.length > 0) {
       res.data.list.map(item => {
-        item['elseStock'] = (item.stock-0)>0?1:0;
+        item['elseStock'] = (item.stock - 0) > 0 ? 1 : 0;
         list.value.push(item);
       })
-      let havestock=res.data.list.findIndex(item=>item.stock>0)
-      chooseItem.value = havestock?res.data.list[havestock].id:'';
-      chooseStoce.value =havestock?res.data.list[havestock].stock:'';
+      // let havestock=res.data.list.findIndex(item=>item.stock>0)
+      // chooseItem.value = havestock?res.data.list[havestock].id:'';
+      // chooseStoce.value =havestock?res.data.list[havestock].stock:'';
     }
-    loading.value=false
-  }).catch(()=>{
-    loading.value=false
+    loading.value = false
+  }).catch(() => {
+    loading.value = false
   })
 }
 const nodePrice = computed(() => {
@@ -221,7 +249,7 @@ watch(() => form.value, () => {
   chooseItem.value = '';
   chooseStoce.value = '';
   totalPrice.value = 0;
-  page.value=1;
+  page.value = 1;
   getNodeList();
 }, {
   deep: true
@@ -245,26 +273,26 @@ function confirm() {
 }
 const confirmPay = () => {
   // 购买
-  isClick.value=true;
+  isClick.value = true;
   proxy.$post(proxy.apis.nodeBuy, {
     id: chooseItem.value,//节点id
-    game_id:form.value.game_id,//游戏id
+    game_id: form.value.game_id,//游戏id
     price_id: chooseDayBuyId.value,//套餐id
     num: chooseStoce.value,//购买数量
   }).then(res => {
     dialogVisible.value = false;
     if (res.code == 1) {
-      page.value=1;
+      page.value = 1;
       getNodeList();
       proxy.$message.success(res.msg)
-    }else{
+    } else {
       proxy.$message.error(res.msg)
     }
   })
 }
-watch(()=>dialogVisible.value,(newData)=>{
-  if(!newData){
-    isClick.value=false;
+watch(() => dialogVisible.value, (newData) => {
+  if (!newData) {
+    isClick.value = false;
   }
 })
 function toggleItem(id) {
@@ -273,13 +301,13 @@ function toggleItem(id) {
 }
 function bottomFixed() {
   if (total.value == list.value.length) {
-    disabledScroll.value=true;
+    disabledScroll.value = true;
     return;
   } else {
     page.value++;
     getNodeList();
   }
-  
+
 }
 </script>
 <style scoped lang="scss">
