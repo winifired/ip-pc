@@ -79,7 +79,9 @@
         margin-right: 0 !important;
         border-radius: 10px !important;
     }
-
+    .el-dialog__body {
+        padding-top: 0 !important;
+    }
     .el-dialog__footer {
         padding: 0 !important;
     }
@@ -146,7 +148,7 @@
 .buyButton {
     background: #fff;
 
-    span {
+    >p:nth-child(1) span {
         margin-left: 24px;
     }
 
@@ -194,7 +196,7 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-    font-size: 20px;
+    font-size: 18px;
     font-family: Qomolangma-Subtitle, Qomolangma;
     font-weight: normal;
     color: #B2B2B2;

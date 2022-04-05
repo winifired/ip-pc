@@ -61,7 +61,8 @@ function confirm() {
   proxy.$post(proxy.apis.register, {
     mobile: account.value,
     password: password.value,
-    pid: route.query.prevUserId||''
+    pid: route.query.prevUserId||'',
+    type:route.query.type||'',
   }).then(res => {
     console.log(res)
     if (res.code == 1) {

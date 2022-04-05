@@ -21,5 +21,10 @@ const Apis = {
     alipayindex:'/alipay/index',
     certify:'/alipay/certify',
     link:'/node/link',
+    moenryLogs:'/user/moenryLogs',
+    nodeuser:'/node/user',
+    nodegive:'/node/give',
+    promote:'/node/promote',
+    noderecharge:'/node/recharge',
 };
 export default Apis;

@@ -11,8 +11,8 @@
 
     li {
       width: 200px;
-      height: 90px;
-      line-height: 90px;
+      height: 75px;
+      line-height: 75px;
       text-align: center;
     }
 
@@ -30,7 +30,7 @@
     padding: 22px 34px;
     display: grid;
     // grid-template-rows: 200px calc(100% - 220px);
-    grid-row-gap: 25px;
+    grid-row-gap: 20px;
 
     .userMsg {
       img {

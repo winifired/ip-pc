@@ -106,6 +106,25 @@
           应付金币：
           <span class="color600 font22">￥{{ totalPrice }}</span>
         </p>
+        <div class="flex row-center account">
+          <el-radio v-model="chooseAccount" label="2" size="large">
+            自定义账号：
+            <el-input
+              v-model="account.name"
+              size="large"
+              placeholder="请输入账号"
+              class="m-2 account-input"
+            />
+            <el-input
+              v-model="account.password"
+              size="large"
+              placeholder="请输入密码"
+              class="m-2 account-input"
+              style="margin-left:20px;"
+            />
+          </el-radio>
+          <el-radio v-model="chooseAccount" label="1" size="large">自动生成</el-radio>
+        </div>
         <button class="font20 colorfff" @click="confirm">购买</button>
       </div>
     </div>
@@ -177,6 +196,12 @@ const dialogVisible = ref(false);
 const totalPrice = ref(0);
 const isClick = ref(false);
 const disabledScroll = ref(false);
+const store = useStore();
+const chooseAccount = ref('1');//1随机账号  2自定义账号
+const account = ref({
+  name: '',
+  password: ''
+})
 onMounted(() => {
   getSerach();
 });
@@ -269,19 +294,6 @@ const elseStockChange = value => {
   totalPrice.value = (value - 0) * (timeItem.price - 0);
 };
 watch(
-  () => form.value,
-  () => {
-    chooseItem.value = "";
-    chooseStoce.value = "";
-    totalPrice.value = 0;
-    page.value = 1;
-    getNodeList();
-  },
-  {
-    deep: true
-  }
-);
-watch(
   () => nodePrice.value,
   newData => {
     const timeItem = dayBuy.value.find(
@@ -301,6 +313,17 @@ function confirm() {
     proxy.$message.error("请选择节点");
     return;
   }
+  if (chooseAccount.value == '2') {
+    if (!account.value.name || !account.value.password) {
+      proxy.$message.error("请输入自定义账号和密码");
+      return;
+    }
+    let reg = /^[a-z0-9]+$/i;
+    if (!reg.test(account.value.password)) {
+      proxy.$message.error("自定义密码只能为数字和英文");
+      return;
+    }
+  }
   dialogVisible.value = true;
 }
 const confirmPay = () => {
@@ -311,9 +334,15 @@ const confirmPay = () => {
     game_id: form.value.game_id,//游戏id
     price_id: chooseDayBuyId.value,//套餐id
     num: chooseStoce.value,//购买数量
+    type: chooseAccount.value,//1=自动生成,2=自定义
+    user: chooseAccount.value == 1 ? '' : account.value.name,//	自定义账号
+    pwd: chooseAccount.value == 1 ? '' : account.value.password,//自定义密码
   }).then(res => {
     dialogVisible.value = false;
     if (res.code == 1) {
+      store.dispatch("updateUserinfo").catch(err => {
+        proxy.$message.error(err);
+      });
       page.value = 1;
       getNodeList();
       proxy.$message.success(res.msg)
@@ -342,6 +371,9 @@ function bottomFixed() {
 }
 </script>
 <style scoped lang="scss">
+.account-input {
+  width: 220px;
+}
 .tipText {
   padding: 50px 0;
   text-align: center;
@@ -394,15 +426,15 @@ function bottomFixed() {
   // background: #fff;
   display: grid;
   grid-template-columns: 1fr;
-  grid-row-gap: 35px;
-  grid-template-rows: 160px auto 160px;
+  // grid-row-gap: 20px;
+  grid-template-rows: 160px auto 170px;
   position: relative;
   z-index: 3;
 }
 .form {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   li {
     width: 80px;
     height: 50px;

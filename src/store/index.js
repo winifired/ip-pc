@@ -21,7 +21,6 @@ export default createStore({
             // console.log(apis)
             return new Promise((resolve,reject)=>{
                 post(apis.base).then(res => {
-                    console.log(res);
                     if (res.code == 1) {
                         resolve({userinfo:res.data.userinfo,real_name:res.data.real_name});
                         commit('setUserinfo', res.data.userinfo);

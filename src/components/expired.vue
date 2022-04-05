@@ -28,9 +28,21 @@ const exportOp = () => {
     detailVue.value.exportVue();
   });
 };
+const convert = () => {
+  nextTick(() => {
+    detailVue.value.convert();
+  });
+};
+const searchIp = () => {
+  nextTick(() => {
+    detailVue.value.searchIp();
+  });
+};
 defineExpose({
   extendOp,
-  exportOp
+  exportOp,
+  convert,
+  searchIp
 });
 // import { getCurrentInstance, onMounted } from "@vue/runtime-core";
 // import { useRouter } from "vue-router";

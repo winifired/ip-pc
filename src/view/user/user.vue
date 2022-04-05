@@ -25,18 +25,26 @@
                 <p v-if="userinfo.level > 0">{{ userinfo.level_name }}</p>
               </div>
             </div>
+            <div class="flex row-center">
+              <p
+              class="font20 coloreff cursor"
+              v-if="activedLiItem == 'commission'&&userinfo && userinfo.level==1"
+              @click="copy(1)"
+            >推广代理</p>
             <p
               class="font20 coloreff cursor"
-              v-if="activedLiItem == 'commission'"
-              @click="copy"
-            >复制链接</p>
+              style="margin-left:20px;"
+              v-if="activedLiItem == 'commission'&&userinfo && userinfo.level!=3"
+              @click="copy(2)"
+            >推广客户</p>
+            </div>
           </div>
           <div class="flex numberToatal" v-if="activedLiItem == 'commission'">
-            <div class="flexc area-center colorfff">
+            <div class="flexc area-center colorfff cursor" @click="togglecommission(1)">
               <p class="font40">{{ commissionMsg && commissionMsg.money ? commissionMsg.money : 0 }}</p>
               <p class="font18">共获取佣金</p>
             </div>
-            <div class="flexc area-center colorfff">
+            <div class="flexc area-center colorfff cursor" @click="togglecommission(2)">
               <p class="font40">{{ commissionMsg && commissionMsg.num ? commissionMsg.num : 0 }}</p>
               <p class="font18">推广人员</p>
             </div>
@@ -45,8 +53,12 @@
             <p>{{ titleMsgText }}</p>
             <div
               class="flex column-end btns"
-              v-if="activedLiItem == 'purchaseDetail'||activedLiItem=='expired'"
+              v-if="activedLiItem == 'purchaseDetail' || activedLiItem == 'expired'"
             >
+              <p class="font18 flex area-center search cursor" @click="searchIp">
+                <Search style="width: 1em; height: 1em; margin-right: 8px" />搜索IP
+              </p>
+              <button @click="convert" v-if="userinfo && userinfo.level!=3">转户</button>
               <button @click="extendOp">续费IP</button>
               <button @click="exportOp">导出</button>
             </div>
@@ -79,14 +91,23 @@
           <changePassword v-if="activedLiItem == 'changePassword'" @titleMsg="titleMsg"></changePassword>
           <commission
             :offsetHeight="offsetHeight"
+            :typeShow="commissionItem"
             v-if="activedLiItem == 'commission'"
             @titleMsg="titleMsg"
             @numberMsg="numberMsg"
           ></commission>
-          <realUser :offsetHeight="offsetHeight"
-          :real_name="real_name"
+          <realUser
+            :offsetHeight="offsetHeight"
+            :real_name="real_name"
             v-if="activedLiItem == 'realUser'"
-            @titleMsg="titleMsg"></realUser>
+            @titleMsg="titleMsg"
+          ></realUser>
+          <consumption
+            :offsetHeight="offsetHeight"
+            :real_name="real_name"
+            v-if="activedLiItem == 'consumption'"
+            @titleMsg="titleMsg"
+          ></consumption>
         </div>
       </div>
     </div>
@@ -97,9 +118,11 @@ import { ref } from "@vue/reactivity";
 import {
   defineAsyncComponent,
   getCurrentInstance,
+  inject,
   nextTick,
   watch
 } from "@vue/runtime-core";
+import { Search } from '@element-plus/icons-vue'
 import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -125,6 +148,9 @@ const commission = defineAsyncComponent(() =>
 const realUser = defineAsyncComponent(() =>
   import("../../components/realMsg.vue")
 );
+const consumption = defineAsyncComponent(() =>
+  import("../../components/consumption.vue")
+);
 const userinfo = ref(null);
 const list = ref([
   { id: "purchase", name: "购买记录" }, //purchase
@@ -133,8 +159,10 @@ const list = ref([
   { id: "rechargeRecord", name: "充值记录" }, //rechargeRecord
   // { id: "level", name: "代理等级" }, //level
   { id: "expired", name: "最近到期" }, //expired
+  { id: "consumption", name: "消费记录" }, //consumption
   { id: "realUser", name: "实名认证" },
 ]);
+const purchaseDetailItem = ref('');//1 搜索 2 转户  3导出
 const route = useRoute();
 const router = useRouter();
 const activedLi = ref("purchase");
@@ -143,22 +171,22 @@ const table = ref(null);
 const offsetHeight = ref(0);
 const titleMsgText = ref("");
 const commissionMsg = ref(null);
-const store=useStore();
-const real_name=ref('');
+const store = useStore();
+const real_name = ref('');
 const { proxy } = getCurrentInstance();
 onMounted(() => {
   nextTick(() => {
-    offsetHeight.value = table.value.offsetHeight - 50 + "px";
+    offsetHeight.value = table.value.offsetHeight - 25 + "px";
   });
   changeRouter(route.params.name);
-  store.dispatch('updateUserinfo').then(res=>{
+  store.dispatch('updateUserinfo').then(res => {
     userinfo.value = res.userinfo;
     real_name.value = res.real_name;
-    if (res.userinfo.level > 0) {
-        list.value.splice(1, 0, { id: "commission", name: "推广返佣" });
-        list.value.splice(4, 0, { id: "level", name: "代理等级" });
-      }
-  }).catch(err=>{
+    if (res.userinfo.level!=3) {
+      list.value.splice(1, 0, { id: "commission", name: "推广返佣" });
+      list.value.splice(4, 0, { id: "level", name: "代理等级" });
+    }
+  }).catch(err => {
     proxy.$message.error(err);
   });
 });
@@ -215,21 +243,65 @@ const exportOp = () => {
     });
   }
 };
-const copy = () => {
+const convert = () => {
+  if (userinfo.value.level == 3) {
+    proxy.$message.error('三级代理商暂不可转户');
+    return;
+  }
+  if (activedLiItem.value == "expired") {
+    nextTick(() => {
+      expiredVue.value.convert();
+    });
+  } else {
+    nextTick(() => {
+      detailVue.value.convert();
+    });
+  }
+}
+const searchIp = () => {
+  if (activedLiItem.value == "expired") {
+    nextTick(() => {
+      expiredVue.value.searchIp();
+    });
+  } else {
+    nextTick(() => {
+      detailVue.value.searchIp();
+    });
+  }
+}
+const copy = (type) => {
   let oInput = document.createElement("input");
   oInput.value =
     "http://ip.hangdaokeji.com/#/register?prevUserId=" +
-    localStorage.getItem("useridIp");
+    localStorage.getItem("useridIp")+'&type='+type;
   document.body.appendChild(oInput);
   oInput.select();
   document.execCommand("Copy");
   oInput.remove();
   proxy.$message("复制成功");
 };
+// 切换推广显示
+const commissionItem = ref(1);
+const togglecommission = (type) => {
+  if (userinfo.value.level !=3) {
+    commissionItem.value = type
+  }
+}
+const foo = inject('resetshowItem');
+console.log(foo)
 </script>
 <style scoped lang="scss">
 @import "../../common/user.scss";
 .btns {
+  .search {
+    width: 135px;
+    height: 50px;
+    background: #ffffff;
+    border: 1px solid #d5d5d5;
+    border-radius: 6px;
+    margin-right: 26px;
+    color: #999999;
+  }
   button {
     width: 120px;
     height: 50px;

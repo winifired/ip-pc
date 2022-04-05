@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ipcontent">
     <div class="flex area-between header">
       <img :src="logo" alt class="logo" />
       <ul class="flex area-between">
@@ -118,6 +118,9 @@ function loginout() {
 }
 </script>
 <style scoped lang="scss">
+.ipcontent{
+  min-width:1200px;
+}
 .header {
   height: 80px;
   background: #45aeff;
