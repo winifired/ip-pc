@@ -49,8 +49,7 @@ const prop = defineProps({
 });
 const navbar = ref([
   { id: 1, name: "首页" },
-  { id: 4, name: "个人中心" },
-  { id: 3, name: "充值" }
+  { id: 4, name: "个人中心" }
 ]);
 const chooseNav = ref(prop.chooseHeadNav);
 const router = useRouter();
@@ -69,6 +68,9 @@ onMounted(() => {
       }
     }else{
       navbar.value.splice(1, 0, { id: 2, name: "节点购买" });
+    }
+    if(userinfo.value.level==1){
+      navbar.value.push({ id: 3, name: "充值" });
     }
   }
   showPage(route.name);
