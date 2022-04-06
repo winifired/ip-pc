@@ -27,6 +27,7 @@
             type="number"
             placeholder="自定义"
             class="font30 color000"
+            min="2000"
             v-model.number="inputNumber"
           />
         </p>
@@ -39,7 +40,7 @@
       <div class="font18 color000 flex row-center">
         应付金额：
         <span class="color600 font22">{{ total }}</span>
-        <div class="paytype">
+        <div class="paytype" style="margin-left:40px;">
           <el-radio v-model="paytype" label="1" size="large">
             <p class="flex row-center radioImg">
               <img src="../assets/wx.png" alt />微信支付
@@ -156,6 +157,9 @@ const getData = () => {
 watch(
   () => inputNumber.value,
   newData => {
+    if(newData<2000){
+      inputNumber.value=2000
+    }
     total.value = (newData / ratio.value).toFixed(2);
   }
 );
