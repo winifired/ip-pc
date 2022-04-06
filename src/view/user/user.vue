@@ -156,7 +156,7 @@ const list = ref([
   { id: "purchase", name: "购买记录" }, //purchase
   // { id: "commission", name: "推广返佣" }, //commission
   { id: "changePassword", name: "修改密码" }, //changePassword
-  { id: "rechargeRecord", name: "充值记录" }, //rechargeRecord
+  // { id: "rechargeRecord", name: "充值记录" }, //rechargeRecord
   // { id: "level", name: "代理等级" }, //level
   { id: "expired", name: "节点管理" }, //expired
   { id: "consumption", name: "消费记录" }, //consumption
@@ -185,6 +185,9 @@ onMounted(() => {
     if (res.userinfo.level!=3) {
       list.value.splice(1, 0, { id: "commission", name: "推广返佣" });
       list.value.splice(4, 0, { id: "level", name: "代理等级" });
+    }
+    if (res.userinfo.level==1) {
+      list.value.splice(3, 0, { id: "rechargeRecord", name: "充值记录" });
     }
   }).catch(err => {
     proxy.$message.error(err);

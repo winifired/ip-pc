@@ -136,6 +136,9 @@ const { proxy } = getCurrentInstance();
 const store = useStore();
 onMounted(() => {
   getData();
+  if (store.state.userinfo.level != 1) {
+    router.replace('/');
+  }
   store.dispatch("updateUserinfo").catch(err => {
     proxy.$message.error(err);
   });

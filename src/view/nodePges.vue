@@ -408,8 +408,8 @@ function bottomFixed() {
   }
 }
 .scrollbar-item {
-  width: 230px;
-  min-height: 120px;
+  width: 192px;
+  height: 78px;
   background: #ffffff;
   border: 1px solid #adadad;
   border-radius: 4px;
@@ -434,7 +434,7 @@ function bottomFixed() {
     margin-right: 14px;
   }
 }
-.scrollbar-item:not(:nth-child(5n)) {
+.scrollbar-item:not(:nth-child(6n)) {
   margin-right: 12px;
 }
 .content-nodePage {
