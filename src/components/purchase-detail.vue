@@ -101,7 +101,7 @@
             <span
               v-for="(item, index) in multipleSelection"
               :key="index"
-            >{{ item.ip }} | {{ item.port }} | {{item.user}} | {{item.pwd}} | {{ item.expiretime }}</span>
+            >{{ item.ip }}|{{ item.port }}|{{item.user}}|{{item.pwd}}|{{ item.expiretime }}</span>
           </p>
           <p class="flex area-center">万安格式  <span class="copy" @click="copy(1)">复制</span> </p>
         </div>
@@ -299,14 +299,14 @@ const copy = (type) => {
   let text='';
   if(type==1){
     for(let i in multipleSelection.value){
-      text+=`${multipleSelection.value[i].ip} | ${multipleSelection.value[i].port} | ${multipleSelection.value[i].user} | ${multipleSelection.value[i].pwd} | ${multipleSelection.value[i].expiretime}            `
+      text+=`${multipleSelection.value[i].ip}|${multipleSelection.value[i].port}|${multipleSelection.value[i].user}|${multipleSelection.value[i].pwd}|${multipleSelection.value[i].expiretime} \n`;
     }
   }else{
     for(let i in multipleSelection.value){
-      text+=`${multipleSelection.value[i].ip}:${multipleSelection.value[i].port} ${multipleSelection.value[i].user} ${multipleSelection.value[i].pwd} ${multipleSelection.value[i].expiretime}             `
+      text+=`${multipleSelection.value[i].ip}:${multipleSelection.value[i].port} ${multipleSelection.value[i].user} ${multipleSelection.value[i].pwd} ${multipleSelection.value[i].expiretime} \n`;
     }
   }
-  let oInput = document.createElement("input");
+  let oInput = document.createElement("textarea");
   oInput.value =text;
   document.body.appendChild(oInput);
   oInput.select();
