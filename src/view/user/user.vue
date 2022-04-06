@@ -56,7 +56,7 @@
               v-if="activedLiItem == 'purchaseDetail' || activedLiItem == 'expired'"
             >
               <p class="font18 flex area-center search cursor" @click="searchIp">
-                <Search style="width: 1em; height: 1em; margin-right: 8px" />搜索IP
+                <Search style="width: 1em; height: 1em; margin-right: 8px" />搜索IP或账号
               </p>
               <button @click="convert" v-if="userinfo && userinfo.level!=3">转户</button>
               <button @click="extendOp">续费IP</button>
@@ -158,7 +158,7 @@ const list = ref([
   { id: "changePassword", name: "修改密码" }, //changePassword
   { id: "rechargeRecord", name: "充值记录" }, //rechargeRecord
   // { id: "level", name: "代理等级" }, //level
-  { id: "expired", name: "最近到期" }, //expired
+  { id: "expired", name: "节点管理" }, //expired
   { id: "consumption", name: "消费记录" }, //consumption
   { id: "realUser", name: "实名认证" },
 ]);
@@ -294,7 +294,7 @@ console.log(foo)
 @import "../../common/user.scss";
 .btns {
   .search {
-    width: 135px;
+    width: 165px;
     height: 50px;
     background: #ffffff;
     border: 1px solid #d5d5d5;

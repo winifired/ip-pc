@@ -155,40 +155,48 @@ import {
   watch
 } from "@vue/runtime-core";
 import { useStore } from "vuex";
+import router from "../router";
 
 const { proxy } = getCurrentInstance();
 const form = ref({
   classify: 0,
   onlineServe: 0,
-  game_id: '',
-  city_id: ''
-})
+  game_id: "",
+  city_id: ""
+});
 const loading = ref(true);
-const dayBuy = ref([]);//时间列表
-const chooseDayBuy = ref();//选中的时间
-const chooseDayBuyId = ref();//选中的时间id
-const classifyList = ref([{
-  id: 1,
-  name: '静态'
-}, {
-  id: 2,
-  name: '动态'
-}, {
-  id: 3,
-  name: '全国'
-}])
-const onlineServeList = ref([{
-  id: 2,
-  name: '联通'
-}, {
-  id: 1,
-  name: '电信'
-}]);
-const page = ref(1)
-const gameList = ref([]);//游戏列表
-const game_name = ref('');
-const cityList = ref([]);//城市列表
-const list = ref([]);//节点列表
+const dayBuy = ref([]); //时间列表
+const chooseDayBuy = ref(); //选中的时间
+const chooseDayBuyId = ref(); //选中的时间id
+const classifyList = ref([
+  {
+    id: 1,
+    name: "静态"
+  },
+  {
+    id: 2,
+    name: "动态"
+  },
+  {
+    id: 3,
+    name: "全国"
+  }
+]);
+const onlineServeList = ref([
+  {
+    id: 2,
+    name: "联通"
+  },
+  {
+    id: 1,
+    name: "电信"
+  }
+]);
+const page = ref(1);
+const gameList = ref([]); //游戏列表
+const game_name = ref("");
+const cityList = ref([]); //城市列表
+const list = ref([]); //节点列表
 const total = ref(0);
 const chooseItem = ref(""); //选中的节点
 const chooseStoce = ref(""); //选中的节点购买数量
@@ -197,13 +205,18 @@ const totalPrice = ref(0);
 const isClick = ref(false);
 const disabledScroll = ref(false);
 const store = useStore();
-const chooseAccount = ref('1');//1随机账号  2自定义账号
+const chooseAccount = ref("1"); //1随机账号  2自定义账号
 const account = ref({
-  name: '',
-  password: ''
-})
+  name: "",
+  password: ""
+});
 onMounted(() => {
   getSerach();
+  if (store.state.userinfo.level == 3) {
+    if (store.state.userinfo.switch && store.state.userinfo.switch == 1) {
+      router.replace('/');
+    }
+  }
 });
 function getSerach() {
   proxy.$get(proxy.apis.getSerach).then(res => {
@@ -221,76 +234,76 @@ function getSerach() {
 const querySearchAsync = (queryString, cb) => {
   const results = queryString
     ? gameList.value.filter(createFilter(queryString))
-    : gameList.value
-  cb(results)
-}
-const createFilter = (queryString) => {
-  return (restaurant) => {
+    : gameList.value;
+  cb(results);
+};
+const createFilter = queryString => {
+  return restaurant => {
     return (
       restaurant.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-    )
-  }
-}
+    );
+  };
+};
 
-const handleSelect = (item) => {
+const handleSelect = item => {
   form.value.game_id = item.id;
   game_name.value = item.name;
-}
+};
 function getNodeList() {
   if (page.value == 1) {
     list.value = [];
   }
-  proxy.$get(proxy.apis.nodeIndex, {
-    city_id: form.value.city_id,//地址id
-    game_id: form.value.game_id,//游戏id
-    isp: form.value.onlineServe,//运营商(1=电信,2=联通)
-    status: form.value.classify,//节点分类(1=静态,2=动态,3=全国)
-    page: page.value,//当前页
-    pageSize: 25,//每页数量
-  }).then(res => {
-    dayBuy.value = res.data.price;
-    chooseDayBuy.value = res.data.price[0].name;
-    chooseDayBuyId.value = res.data.price[0].id;
-    total.value = res.data.total;
-    if (res.data.list.length > 0) {
-      res.data.list.map(item => {
-        item['elseStock'] = (item.stock - 0) > 0 ? 1 : 0;
-        list.value.push(item);
-      })
-      // let havestock=res.data.list.findIndex(item=>item.stock>0)
-      // chooseItem.value = havestock?res.data.list[havestock].id:'';
-      // chooseStoce.value =havestock?res.data.list[havestock].stock:'';
-    }
-    loading.value = false
-  }).catch(() => {
-    loading.value = false
-  })
+  proxy
+    .$get(proxy.apis.nodeIndex, {
+      city_id: form.value.city_id, //地址id
+      game_id: form.value.game_id, //游戏id
+      isp: form.value.onlineServe, //运营商(1=电信,2=联通)
+      status: form.value.classify, //节点分类(1=静态,2=动态,3=全国)
+      page: page.value, //当前页
+      pageSize: 25 //每页数量
+    })
+    .then(res => {
+      dayBuy.value = res.data.price;
+      chooseDayBuy.value = res.data.price[0].name;
+      chooseDayBuyId.value = res.data.price[0].id;
+      total.value = res.data.total;
+      if (res.data.list.length > 0) {
+        res.data.list.map(item => {
+          item["elseStock"] = 1;
+          list.value.push(item);
+        });
+        // let havestock=res.data.list.findIndex(item=>item.stock>0)
+        // chooseItem.value = havestock?res.data.list[havestock].id:'';
+        // chooseStoce.value =havestock?res.data.list[havestock].stock:'';
+      }
+      loading.value = false;
+    })
+    .catch(() => {
+      loading.value = false;
+    });
 }
 const nodePrice = computed(() => {
   return {
     chooseItem: chooseItem.value,
     chooseDayBuy: chooseDayBuy.value
-  }
-})
-watch(() => form.value, () => {
-  chooseItem.value = '';
-  chooseStoce.value = '';
-  totalPrice.value = 0;
-  page.value = 1;
-  getNodeList();
-}, {
-  deep: true
-})
-watch(() => nodePrice.value, (newData) => {
-  const timeItem = dayBuy.value.find(item => item.name == newData.chooseDayBuy);
-  chooseDayBuyId.value = timeItem.id;
-  const nodeItem = list.value.find(item => item.id == newData.chooseItem);
-  if (!nodeItem) {
-    return
   };
 });
+watch(
+  () => form.value,
+  () => {
+    chooseItem.value = "";
+    chooseStoce.value = "";
+    totalPrice.value = 0;
+    page.value = 1;
+    getNodeList();
+  },
+  {
+    deep: true
+  }
+);
 const elseStockChange = value => {
   const timeItem = dayBuy.value.find(item => item.name == chooseDayBuy.value);
+  chooseStoce.value = value;
   totalPrice.value = (value - 0) * (timeItem.price - 0);
 };
 watch(
@@ -313,7 +326,7 @@ function confirm() {
     proxy.$message.error("请选择节点");
     return;
   }
-  if (chooseAccount.value == '2') {
+  if (chooseAccount.value == "2") {
     if (!account.value.name || !account.value.password) {
       proxy.$message.error("请输入自定义账号和密码");
       return;
@@ -329,33 +342,38 @@ function confirm() {
 const confirmPay = () => {
   // 购买
   isClick.value = true;
-  proxy.$post(proxy.apis.nodeBuy, {
-    id: chooseItem.value,//节点id
-    game_id: form.value.game_id,//游戏id
-    price_id: chooseDayBuyId.value,//套餐id
-    num: chooseStoce.value,//购买数量
-    type: chooseAccount.value,//1=自动生成,2=自定义
-    user: chooseAccount.value == 1 ? '' : account.value.name,//	自定义账号
-    pwd: chooseAccount.value == 1 ? '' : account.value.password,//自定义密码
-  }).then(res => {
-    dialogVisible.value = false;
-    if (res.code == 1) {
-      store.dispatch("updateUserinfo").catch(err => {
-        proxy.$message.error(err);
-      });
-      page.value = 1;
-      getNodeList();
-      proxy.$message.success(res.msg)
-    } else {
-      proxy.$message.error(res.msg)
+  proxy
+    .$post(proxy.apis.nodeBuy, {
+      id: chooseItem.value, //节点id
+      game_id: form.value.game_id, //游戏id
+      price_id: chooseDayBuyId.value, //套餐id
+      num: chooseStoce.value, //购买数量
+      type: chooseAccount.value, //1=自动生成,2=自定义
+      user: chooseAccount.value == 1 ? "" : account.value.name, //	自定义账号
+      pwd: chooseAccount.value == 1 ? "" : account.value.password //自定义密码
+    })
+    .then(res => {
+      dialogVisible.value = false;
+      if (res.code == 1) {
+        store.dispatch("updateUserinfo").catch(err => {
+          proxy.$message.error(err);
+        });
+        page.value = 1;
+        getNodeList();
+        proxy.$message.success(res.msg);
+      } else {
+        proxy.$message.error(res.msg);
+      }
+    });
+};
+watch(
+  () => dialogVisible.value,
+  newData => {
+    if (!newData) {
+      isClick.value = false;
     }
-  })
-}
-watch(() => dialogVisible.value, (newData) => {
-  if (!newData) {
-    isClick.value = false;
   }
-})
+);
 function toggleItem(id) {
   // 节点切换
   chooseItem.value = id;

@@ -15,7 +15,7 @@
             >
                 <img :src="item.avatar" alt />
                 <div class="font20 color707">
-                    <p>{{ item.nickname }}</p>
+                    <p>{{ item.username }}</p>
                     <div class="flex area-between">
                         <p>{{ item.level_name }}</p>
                         <p

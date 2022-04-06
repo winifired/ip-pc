@@ -53,7 +53,7 @@ defineExpose({
 // const tableData = ref([]);
 // const emit=defineEmits();
 // onMounted(()=>{
-//     emit('titleMsg','最近到期');
+//     emit('titleMsg','节点管理');
 //     getData();
 // })
 // const getData=()=>{

@@ -101,18 +101,18 @@
             <span
               v-for="(item, index) in multipleSelection"
               :key="index"
-            >{{ item.ip }} | {{ item.port }} | user | pwd | {{ item.expiretime }}</span>
+            >{{ item.ip }} | {{ item.port }} | {{item.user}} | {{item.pwd}} | {{ item.expiretime }}</span>
           </p>
-          <p>万安格式</p>
+          <p class="flex area-center">万安格式  <span class="copy" @click="copy(1)">复制</span> </p>
         </div>
         <div class="otem cursor" @click="chooseExport = 2">
           <p :class="chooseExport == 2 ? 'chooseuser' : ''">
             <span
               v-for="(item, index) in multipleSelection"
               :key="index"
-            >{{ item.ip }} {{ item.port }} user pwd {{ item.expiretime }}</span>
+            >{{ item.ip }}:{{ item.port }} {{item.user}} {{item.pwd}} {{ item.expiretime }}</span>
           </p>
-          <p>HTTP格式</p>
+          <p class="flex area-center">HTTP格式  <span class="copy" @click="copy(2)">复制</span> </p>
         </div>
       </div>
     </div>
@@ -157,7 +157,7 @@ const chooseExport = ref(1);//1 万安格式 2 HTTP格式
 const nodeuserlist = ref([]);
 onMounted(() => {
   if (prop.typenum == 1) {
-    emit("titleMsg", "最近到期");
+    emit("titleMsg", "节点管理");
   } else {
     emit("titleMsg", "节点列表");
   }
@@ -295,9 +295,25 @@ function downloadFile(url, filename) {
       document.body.removeChild(link);
     });
 }
-const searchuserPhone = () => {
-  // 搜索用户
-}
+const copy = (type) => {
+  let text='';
+  if(type==1){
+    for(let i in multipleSelection.value){
+      text+=`${multipleSelection.value[i].ip} | ${multipleSelection.value[i].port} | ${multipleSelection.value[i].user} | ${multipleSelection.value[i].pwd} | ${multipleSelection.value[i].expiretime}            `
+    }
+  }else{
+    for(let i in multipleSelection.value){
+      text+=`${multipleSelection.value[i].ip}:${multipleSelection.value[i].port} ${multipleSelection.value[i].user} ${multipleSelection.value[i].pwd} ${multipleSelection.value[i].expiretime}             `
+    }
+  }
+  let oInput = document.createElement("input");
+  oInput.value =text;
+  document.body.appendChild(oInput);
+  oInput.select();
+  document.execCommand("Copy");
+  oInput.remove();
+  proxy.$message("复制成功");
+};
 // 操作弹窗确认
 const confirmType = () => {
   if (showItemElse.value == 1) {
@@ -417,5 +433,12 @@ defineExpose({
       margin-top: 12px;
     }
   }
+}
+.copy{
+  cursor: pointer;
+  font-size: 18px;
+  color:#45aeff!important;
+  margin-top:0!important;
+  margin-left: 12px;
 }
 </style>

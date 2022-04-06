@@ -49,7 +49,6 @@ const prop = defineProps({
 });
 const navbar = ref([
   { id: 1, name: "首页" },
-  { id: 2, name: "节点购买" },
   { id: 4, name: "个人中心" },
   { id: 3, name: "充值" }
 ]);
@@ -64,6 +63,13 @@ const {proxy}=getCurrentInstance();
 onMounted(() => {
   if (store.state.userinfo) {
     userinfo.value = store.state.userinfo;
+    if(userinfo.value.level==3){
+      if(userinfo.value.switch&&userinfo.value.switch==2){
+        navbar.value.splice(1, 0, { id: 2, name: "节点购买" });
+      }
+    }else{
+      navbar.value.splice(1, 0, { id: 2, name: "节点购买" });
+    }
   }
   showPage(route.name);
   proxy.$get(proxy.apis.link).then(res => {
