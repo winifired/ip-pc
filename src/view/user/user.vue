@@ -154,7 +154,7 @@ const consumption = defineAsyncComponent(() =>
 const userinfo = ref(null);
 const list = ref([
   { id: "purchase", name: "购买记录" }, //purchase
-  // { id: "commission", name: "推广返佣" }, //commission
+  // { id: "commission", name: "推广充值" }, //commission
   { id: "changePassword", name: "修改密码" }, //changePassword
   // { id: "rechargeRecord", name: "充值记录" }, //rechargeRecord
   // { id: "level", name: "代理等级" }, //level
@@ -183,7 +183,7 @@ onMounted(() => {
     userinfo.value = res.userinfo;
     real_name.value = res.real_name;
     if (res.userinfo.level!=3) {
-      list.value.splice(1, 0, { id: "commission", name: "推广返佣" });
+      list.value.splice(1, 0, { id: "commission", name: "推广充值" });
       list.value.splice(4, 0, { id: "level", name: "代理等级" });
     }
     if (res.userinfo.level==1) {

@@ -75,7 +75,7 @@ const chooseindex = ref(0);//充值对象
 const promotelist = ref([]);
 onMounted(() => {
     if (prop.typeShow == 1) {
-        emit('titleMsg', '推广返佣');
+        emit('titleMsg', '推广充值');
     } else {
         emit('titleMsg', '推广人员');
     }
@@ -85,7 +85,7 @@ onMounted(() => {
 watch(() => prop.typeShow, (newData) => {
     console.log(newData)
     if (newData == 1) {
-        emit('titleMsg', '推广返佣');
+        emit('titleMsg', '推广充值');
     } else {
         emit('titleMsg', '推广人员');
     }
