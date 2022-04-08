@@ -389,7 +389,7 @@ function toggleItem(stock, index) {
 function bottomFixed() {
   disabledScroll.value = true;
   page.value++;
-  this.getNodeList();
+  getNodeList();
 }
 </script>
 <style scoped lang="scss">
