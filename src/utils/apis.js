@@ -26,5 +26,6 @@ const Apis = {
     nodegive:'/node/give',
     promote:'/node/promote',
     noderecharge:'/node/recharge',
+    filing:'/index/filing'
 };
 export default Apis;

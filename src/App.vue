@@ -1,7 +1,7 @@
 <script setup>
 import headerPage from "./components/header.vue";
 import { useRoute, useRouter } from "vue-router";
-import { ref } from "@vue/reactivity";
+import { getCurrentInstance,ref } from "vue";
 import { watch } from "@vue/runtime-core";
 const route = useRoute();
 const router = useRouter();
@@ -22,12 +22,22 @@ watch(
     }
   }
 );
+const filing=ref('');
+const {proxy}=getCurrentInstance();
+proxy.$post(proxy.apis.filing).then(res => {
+    console.log(res);
+    if (res.code == 1) {
+      filing.value = res.data.filing;
+    }
+  });
 </script>
 
 <template>
   <headerPage v-if="showHeader"></headerPage>
   <router-view />
-  <div class="company" :style="{ color: companyColor }">Copyright © 2022 XXXXXX有限公司</div>
+  <a href="https://beian.miit.gov.cn/">
+    <div class="company" :style="{ color: companyColor }">{{filing}}</div>
+  </a>
 </template>
 
 <style lang="scss">
