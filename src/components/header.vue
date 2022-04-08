@@ -18,8 +18,7 @@
       >
         <template #reference>
           <div class="flex row-center font22 colorfff cursor" @click="toggelHeadNav(4)">
-            <img :src="userinfo.avatar" alt class="avatar" v-if="userinfo && userinfo.avatar" />
-            <img src="../assets/avatar.png" alt class="avatar" v-else />
+            <img src="../assets/avatar.png" alt class="avatar" />
             <div>
               {{ userinfo && userinfo.nickname ? userinfo.nickname : '' }}
               <p v-if="userinfo" class="font16">余额：{{ userinfo.money}}</p>

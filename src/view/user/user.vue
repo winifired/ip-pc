@@ -19,7 +19,7 @@
         <div class="title flexc column-bwn">
           <div class="flex area-between" v-if="userinfo">
             <div class="flex row-center userMsg">
-              <img :src="userinfo.avatar" alt />
+              <img src="../../assets/avatar.png" alt />
               <div class="font20 color707">
                 <p>{{ userinfo.username }}</p>
                 <p v-if="userinfo.level > 0">{{ userinfo.level_name }}</p>

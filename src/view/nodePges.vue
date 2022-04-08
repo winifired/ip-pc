@@ -51,7 +51,8 @@
         </div>
       </div>
     </div>
-    <el-scrollbar always>
+    <el-scrollbar always @scroll="scroll">
+      <!-- -->
       <div class="flex" v-infinite-scroll="bottomFixed" :infinite-scroll-disabled="disabledScroll">
         <div
           v-for="(item, index) in list"
@@ -212,7 +213,7 @@ onMounted(() => {
   getSerach();
   if (store.state.userinfo.level == 3) {
     if (store.state.userinfo.switch && store.state.userinfo.switch == 1) {
-      router.replace('/');
+      router.replace("/");
     }
   }
 });
@@ -258,7 +259,7 @@ function getNodeList() {
       isp: form.value.onlineServe, //运营商(1=电信,2=联通)
       status: form.value.classify, //节点分类(1=静态,2=动态,3=全国)
       page: page.value, //当前页
-      pageSize: 25 //每页数量
+      pageSize: 36 //每页数量
     })
     .then(res => {
       dayBuy.value = res.data.price;
@@ -271,6 +272,7 @@ function getNodeList() {
           item["elseStock"] = 1;
           list.value.push(item);
         });
+        disabledScroll.value = false;
       }
       loading.value = false;
     })
@@ -291,37 +293,44 @@ watch(
     deep: true
   }
 );
-watch(() => chooseDayBuy.value, (newData) => {
-  checkTotal()
-})
-watch(() => list.value, (newData) => {
-  checkTotal()
-}, {
-  deep: true
-});
+watch(
+  () => chooseDayBuy.value,
+  newData => {
+    checkTotal();
+  }
+);
+watch(
+  () => list.value,
+  newData => {
+    checkTotal();
+  },
+  {
+    deep: true
+  }
+);
 const checkTotal = () => {
   let total = 0;
   const timeItem = dayBuy.value.find(item => item.name == chooseDayBuy.value);
   if (!timeItem) return;
   list.value.map(item => {
     if (item.checked) {
-      total += (item.elseStock - 0);
+      total += item.elseStock - 0;
     }
   });
   chooseStoce.value = total;
   totalPrice.value = (total * (timeItem.price - 0)).toFixed(2);
-}
+};
 function confirm() {
-  chooseItem.value=[];
+  chooseItem.value = [];
   list.value.map(item => {
     if (item.checked) {
       chooseItem.value.push({
-        id:item.id,
-        num:item.elseStock
-      })
+        id: item.id,
+        num: item.elseStock
+      });
     }
   });
-  if (chooseItem.value.length==0) {
+  if (chooseItem.value.length == 0) {
     proxy.$message.error("请选择节点");
     return;
   }
@@ -374,17 +383,13 @@ watch(
 );
 function toggleItem(stock, index) {
   // 节点切换
-  if ((stock - 0) <= 0) return;
+  if (stock - 0 <= 0) return;
   list.value[index].checked = !list.value[index].checked;
 }
 function bottomFixed() {
-  if (total.value == list.value.length) {
-    disabledScroll.value = true;
-    return;
-  } else {
-    page.value++;
-    getNodeList();
-  }
+  disabledScroll.value = true;
+  page.value++;
+  this.getNodeList();
 }
 </script>
 <style scoped lang="scss">

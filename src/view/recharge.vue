@@ -27,7 +27,7 @@
             type="number"
             placeholder="自定义"
             class="font30 color000"
-            min="2000"
+            min="3000"
             v-model.number="inputNumber"
           />
         </p>
@@ -157,8 +157,8 @@ const getData = () => {
 watch(
   () => inputNumber.value,
   newData => {
-    if(newData<2000){
-      inputNumber.value=2000
+    if(newData<3000){
+      inputNumber.value=3000
     }
     total.value = (newData / ratio.value).toFixed(2);
   }

@@ -13,7 +13,7 @@
                 v-for="(item, index) in promotelist"
                 :key="index"
             >
-                <img :src="item.avatar" alt />
+                <img src="../assets/avatar.png" alt />
                 <div class="font20 color707">
                     <p>{{ item.username }}</p>
                     <div class="flex area-between">

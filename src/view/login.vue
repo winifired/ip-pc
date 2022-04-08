@@ -3,8 +3,9 @@
     <Particles id="tsparticles" class="login__particles" :options="particles" />
     <div class="content-login flex row-center">
       <h3>
-        欢迎使用IP分配
-        <span>管理系统</span>
+        畅享加速器
+        <!-- 欢迎使用IP分配
+        <span>管理系统</span> -->
       </h3>
       <div class="flex row-center input">
         <User class="icon" color="#A8A8A8" />

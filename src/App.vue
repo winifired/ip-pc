@@ -1,7 +1,7 @@
 <script setup>
 import headerPage from "./components/header.vue";
 import { useRoute, useRouter } from "vue-router";
-import { getCurrentInstance,ref } from "vue";
+import { getCurrentInstance, ref } from "vue";
 import { watch } from "@vue/runtime-core";
 const route = useRoute();
 const router = useRouter();
@@ -22,21 +22,24 @@ watch(
     }
   }
 );
-const filing=ref('');
-const {proxy}=getCurrentInstance();
+const filing = ref("");
+const { proxy } = getCurrentInstance();
 proxy.$post(proxy.apis.filing).then(res => {
-    console.log(res);
-    if (res.code == 1) {
-      filing.value = res.data.filing;
-    }
-  });
+  console.log(res);
+  if (res.code == 1) {
+    filing.value = res.data.filing;
+  }
+});
 </script>
 
 <template>
   <headerPage v-if="showHeader"></headerPage>
   <router-view />
   <a href="https://beian.miit.gov.cn/">
-    <div class="company" :style="{ color: companyColor }">{{filing}}</div>
+    <div class="company">
+      <div :style="{ color: companyColor }">Copyright 2022 深圳市畅享信息科技发展有限公司版权所有</div>
+      <div :style="{ color: companyColor }">备案号：{{filing}}</div>
+    </div>
   </a>
 </template>
 
@@ -57,14 +60,15 @@ proxy.$post(proxy.apis.filing).then(res => {
   -moz-osx-font-smoothing: grayscale;
 }
 .company {
-  font-size: 18px;
+  font-size: 13px;
   font-family: PingFang SC;
   font-weight: 300;
   position: fixed;
-  bottom: 10px;
+  bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;
+  text-align: center;
 }
 .el-input-number {
   width: 106px !important;
@@ -73,9 +77,9 @@ proxy.$post(proxy.apis.filing).then(res => {
 .el-input-number__increase {
   background: #fff !important;
 }
-.realmsgxieyi{
+.realmsgxieyi {
   .el-dialog__header {
-    padding:0!important;
+    padding: 0 !important;
   }
   .el-dialog__body {
     padding: 20px 30px !important;

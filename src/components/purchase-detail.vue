@@ -87,7 +87,7 @@
             @click="choosezhuanhu = index"
             :class="choosezhuanhu == index ? 'chooseuser' : ''"
           >
-            <img :src="item.avatar" alt />
+            <img src="../assets/avatar.png" alt />
             <div class="font20 color707">
               <p>{{ item.username }}</p>
               <p>{{ item.level_name }}</p>

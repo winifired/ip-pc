@@ -33,7 +33,7 @@
           </p>
         </a>
       </div>
-      <div class="colorfff font18">
+      <!-- <div class="colorfff font18">
         华为创立于1987年，是全球领先的ICT（信息与通信）基础设施和智能终端提供商。目前华为约有19.7万员工，业务遍及170多个国家和地区，服务全球30多亿人口。
         华为致力于把数字世界带入每个人、每个家庭、每个组织，构建万物互联的智能世界：让无处不在的联接，成为人人平等的权利，成为智能世界的前提和基础；为世界提供最强算力，让云无处不在，让智能无所不及；所有的行业和组织，因强大的数字平台而变得敏捷、高效、生机勃勃；通过AI重新定义体验，让消费者在家居、出行、办公、影音娱乐、运动健康等全场景获得极致的个性化智慧体验。
       </div>
@@ -41,7 +41,7 @@
         <img src="../assets/1.png" alt />
         <img src="../assets/2.png" alt />
         <img src="../assets/3.png" alt />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -76,30 +76,31 @@ function getData() {
     z-index: 20;
     width: 1230px;
     margin: 0 auto;
-    padding-top: 200px;
+    padding-top: 128px;
     padding-bottom: 169px;
   }
   h1 {
-    font-size: 80px;
+    font-size: 60px;
     font-family: PingFang SC;
     font-weight: 400;
     color: #ffffff;
     text-align: center;
   }
   .tip {
-    font-size: 26px;
+    font-size: 17px;
     font-family: PingFang SC;
     font-weight: 400;
     color: #ffffff;
     line-height: 50px;
     margin-top: 43px;
+    text-align: center;
   }
   .urls {
-    margin-top: 139px;
-    margin-bottom: 189px;
+    margin-top: 125px;
+    padding:0 105px;
     p {
-      width: 230px;
-      height: 90px;
+      width: 200px;
+      height: 80px;
       background: #1474fc;
       border: 2px solid #ffffff;
       border-radius: 14px;
