@@ -51,9 +51,13 @@
         </div>
       </div>
     </div>
-    <el-scrollbar always @scroll="scroll">
-      <!-- -->
-      <div class="flex" v-infinite-scroll="bottomFixed" :infinite-scroll-disabled="disabledScroll">
+    <!-- <el-scrollbar always :height="getHieght"> -->
+      <div
+        class="flex content-cont"
+        v-infinite-scroll="bottomFixed"
+        :infinite-scroll-disabled="disabledScroll"
+        :infinite-scroll-distance="50"
+      >
         <div
           v-for="(item, index) in list"
           :key="item.id"
@@ -87,7 +91,7 @@
           </div>
         </div>
       </div>
-    </el-scrollbar>
+    <!-- </el-scrollbar > -->
     <div class="bottom flex column-bwn">
       <div class="flex row-center">
         <p class="font18 color000">购买时长：</p>
@@ -191,7 +195,7 @@ const onlineServeList = ref([
     name: "电信"
   }
 ]);
-const page = ref(1);
+const page = ref(0);
 const gameList = ref([]); //游戏列表
 const game_name = ref("");
 const cityList = ref([]); //城市列表
@@ -249,9 +253,7 @@ const handleSelect = item => {
   game_name.value = item.name;
 };
 function getNodeList() {
-  if (page.value == 1) {
-    list.value = [];
-  }
+  console.log(page.value)
   proxy
     .$get(proxy.apis.nodeIndex, {
       city_id: form.value.city_id, //地址id
@@ -259,7 +261,7 @@ function getNodeList() {
       isp: form.value.onlineServe, //运营商(1=电信,2=联通)
       status: form.value.classify, //节点分类(1=静态,2=动态,3=全国)
       page: page.value, //当前页
-      pageSize: 36 //每页数量
+      pageSize: 42 //每页数量
     })
     .then(res => {
       dayBuy.value = res.data.price;
@@ -286,8 +288,8 @@ watch(
     chooseItem.value = [];
     chooseStoce.value = 0;
     totalPrice.value = 0;
-    page.value = 1;
-    getNodeList();
+    page.value = 0;
+    bottomFixed();
   },
   {
     deep: true
@@ -365,8 +367,8 @@ const confirmPay = () => {
         store.dispatch("updateUserinfo").catch(err => {
           proxy.$message.error(err);
         });
-        page.value = 1;
-        getNodeList();
+        page.value = 0;
+        bottomFixed();
         proxy.$message.success(res.msg);
       } else {
         proxy.$message.error(res.msg);
@@ -387,9 +389,13 @@ function toggleItem(stock, index) {
   list.value[index].checked = !list.value[index].checked;
 }
 function bottomFixed() {
+  if (!form.value.game_id) return;
   disabledScroll.value = true;
   page.value++;
-  getNodeList();
+  if (page.value == 1) {
+    list.value = [];
+  }
+  setTimeout(() => { getNodeList(); })
 }
 </script>
 <style scoped lang="scss">
@@ -401,6 +407,9 @@ function bottomFixed() {
   text-align: center;
 }
 .bottom {
+  position: fixed;
+  bottom:0px;
+  z-index: 20;
   width: 1230px;
   height: 160px;
   background: #ffffff;
@@ -445,18 +454,26 @@ function bottomFixed() {
   width: 1230px;
   height: calc(100vh - 80px);
   margin: 0 auto;
-  // background: #fff;
-  display: grid;
-  grid-template-columns: 1fr;
+  // display: grid;
+  // grid-template-columns: 1fr;
   // grid-row-gap: 20px;
-  grid-template-rows: 160px auto 170px;
+  // grid-template-rows: 160px auto 160px;
   position: relative;
   z-index: 3;
 }
+.content-cont{
+  padding:160px 0;
+}
 .form {
+  position: fixed;
+  top:80px;
+  width: 100%;
+  z-index: 20;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background: #fff;
+  height: 160px;
   li {
     width: 80px;
     height: 50px;
