@@ -275,7 +275,7 @@ const searchIp = () => {
 const copy = (type) => {
   let oInput = document.createElement("input");
   oInput.value =
-    "http://ip.hangdaokeji.com/#/register?prevUserId=" +
+    "http://ip.changxiangip.com/#/register?prevUserId=" +
     localStorage.getItem("useridIp")+'&type='+type;
   document.body.appendChild(oInput);
   oInput.select();
