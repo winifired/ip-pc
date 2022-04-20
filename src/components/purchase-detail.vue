@@ -103,7 +103,10 @@
               :key="index"
             >{{ item.ip }}|{{ item.port }}|{{item.user}}|{{item.pwd}}|{{ item.expiretime }}</span>
           </p>
-          <p class="flex area-center">万安格式  <span class="copy" @click="copy(1)">复制</span> </p>
+          <p class="flex area-center">
+            万安格式
+            <span class="copy" @click="copy(1)">复制</span>
+          </p>
         </div>
         <div class="otem cursor" @click="chooseExport = 2">
           <p :class="chooseExport == 2 ? 'chooseuser' : ''">
@@ -112,7 +115,10 @@
               :key="index"
             >{{ item.ip }}:{{ item.port }} {{item.user}} {{item.pwd}} {{ item.expiretime }}</span>
           </p>
-          <p class="flex area-center">HTTP格式  <span class="copy" @click="copy(2)">复制</span> </p>
+          <p class="flex area-center">
+            HTTP格式
+            <span class="copy" @click="copy(2)">复制</span>
+          </p>
         </div>
       </div>
     </div>
@@ -129,7 +135,7 @@ import { ref } from "@vue/reactivity";
 import { getCurrentInstance, onMounted, watch } from "@vue/runtime-core";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
-import { Search } from '@element-plus/icons-vue'
+import { Search } from "@element-plus/icons-vue";
 const route = useRoute();
 const prop = defineProps({
   offsetHeight: String,
@@ -139,9 +145,9 @@ const prop = defineProps({
   }
 });
 const dialogVisibleElse = ref(false);
-const showItemElse = ref(0);//选中的操作
-const textareaSearch = ref('');//搜索IP
-const searchPhone = ref('');//搜索用户
+const showItemElse = ref(0); //选中的操作
+const textareaSearch = ref(""); //搜索IP
+const searchPhone = ref(""); //搜索用户
 const choosezhuanhu = ref(-1);
 const { proxy } = getCurrentInstance();
 const emit = defineEmits();
@@ -153,7 +159,7 @@ const chooseDayBuy = ref(); //选中的时间
 const chooseDayBuyId = ref(); //选中的时间id
 const totalPrice = ref(0);
 const store = useStore();
-const chooseExport = ref(1);//1 万安格式 2 HTTP格式
+const chooseExport = ref(1); //1 万安格式 2 HTTP格式
 const nodeuserlist = ref([]);
 onMounted(() => {
   if (prop.typenum == 1) {
@@ -162,7 +168,7 @@ onMounted(() => {
     emit("titleMsg", "节点列表");
   }
   getData();
-  getnodeuser();//转户列表
+  getnodeuser(); //转户列表
 });
 const getData = () => {
   let url = "",
@@ -183,28 +189,30 @@ const getData = () => {
     if (res.code == 1) {
       tableData.value = res.data.list;
       renew.value = res.data.renew;
-      chooseDayBuy.value = res.data.renew[0].name;
-      chooseDayBuyId.value = res.data.renew[0].id;
-      totalPrice.value = res.data.renew[0].price;
+      // chooseDayBuy.value = res.data.renew[0].name;
+      // chooseDayBuyId.value = res.data.renew[0].id;
+      // totalPrice.value = res.data.renew[0].price;
       dialogVisibleElse.value = false;
     }
   });
 };
 const getnodeuser = () => {
-  proxy.$get(proxy.apis.nodeuser, {
-    search: searchPhone.value
-  }).then(res => {
-    if (res.code == 1) {
-      nodeuserlist.value = res.data.list;
-    }
-  });
-}
+  proxy
+    .$get(proxy.apis.nodeuser, {
+      search: searchPhone.value
+    })
+    .then(res => {
+      if (res.code == 1) {
+        nodeuserlist.value = res.data.list;
+      }
+    });
+};
 watch(
   () => chooseDayBuy.value,
   newData => {
     const timeItem = renew.value.find(item => item.name == newData);
     chooseDayBuyId.value = timeItem.id;
-    totalPrice.value = timeItem.price;
+    totalPrice.value = timeItem.price * multipleSelection.value.length;
   }
 );
 const multipleSelection = ref([]);
@@ -216,6 +224,9 @@ const extendVue = () => {
     proxy.$message.error("请选择要续费的IP");
     return;
   }
+  chooseDayBuy.value = renew.value[0].name;
+  chooseDayBuyId.value = renew.value[0].id;
+  totalPrice.value = renew.value[0].price * multipleSelection.value.length;
   dialogVisible.value = true;
 };
 const convert = () => {
@@ -295,19 +306,19 @@ function downloadFile(url, filename) {
       document.body.removeChild(link);
     });
 }
-const copy = (type) => {
-  let text='';
-  if(type==1){
-    for(let i in multipleSelection.value){
-      text+=`${multipleSelection.value[i].ip}|${multipleSelection.value[i].port}|${multipleSelection.value[i].user}|${multipleSelection.value[i].pwd}|${multipleSelection.value[i].expiretime} \n`;
+const copy = type => {
+  let text = "";
+  if (type == 1) {
+    for (let i in multipleSelection.value) {
+      text += `${multipleSelection.value[i].ip}|${multipleSelection.value[i].port}|${multipleSelection.value[i].user}|${multipleSelection.value[i].pwd}|${multipleSelection.value[i].expiretime} \n`;
     }
-  }else{
-    for(let i in multipleSelection.value){
-      text+=`${multipleSelection.value[i].ip}:${multipleSelection.value[i].port} ${multipleSelection.value[i].user} ${multipleSelection.value[i].pwd} ${multipleSelection.value[i].expiretime} \n`;
+  } else {
+    for (let i in multipleSelection.value) {
+      text += `${multipleSelection.value[i].ip}:${multipleSelection.value[i].port} ${multipleSelection.value[i].user} ${multipleSelection.value[i].pwd} ${multipleSelection.value[i].expiretime} \n`;
     }
   }
   let oInput = document.createElement("textarea");
-  oInput.value =text;
+  oInput.value = text;
   document.body.appendChild(oInput);
   oInput.select();
   document.execCommand("Copy");
@@ -335,7 +346,7 @@ const confirmType = () => {
       })
       .then(res => {
         if (res.code == 1) {
-          proxy.$message('转户成功');
+          proxy.$message("转户成功");
           dialogVisibleElse.value = false;
           getData();
         } else {
@@ -345,7 +356,7 @@ const confirmType = () => {
   } else if (showItemElse.value == 3) {
     confirmExport();
   }
-}
+};
 defineExpose({
   extendVue,
   exportVue,
@@ -375,7 +386,7 @@ defineExpose({
   border-radius: 6px;
   padding: 0 19px;
   input {
-    flex:1;
+    flex: 1;
     font-size: 18px;
   }
 }
@@ -434,11 +445,11 @@ defineExpose({
     }
   }
 }
-.copy{
+.copy {
   cursor: pointer;
   font-size: 18px;
-  color:#45aeff!important;
-  margin-top:0!important;
+  color: #45aeff !important;
+  margin-top: 0 !important;
   margin-left: 12px;
 }
 </style>
